@@ -90,7 +90,7 @@ curl -O https://raw.githubusercontent.com/benjamira/tortoise-tracker/main/docker
 docker compose up -d
 ```
 
-Danach im Browser: **http://<host>:8080**
+Danach im Browser: `http://SERVER-IP:8080`
 
 `docker compose up -d` zieht die veröffentlichten Images von der GitHub Container
 Registry. Aktualisieren:
@@ -99,12 +99,12 @@ Registry. Aktualisieren:
 docker compose pull && docker compose up -d
 ```
 
-Aus dem Quellcode bauen statt Images ziehen:
+Images lokal aus dem Quellcode bauen (optional, z. B. für Entwicklung):
 
 ```bash
 git clone https://github.com/benjamira/tortoise-tracker.git
 cd tortoise-tracker
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ```
 
 ### Variante B – `docker run`
