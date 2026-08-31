@@ -1,0 +1,22 @@
+# Pulls the published images by default. Run `docker compose up --build` to build
+# locally from source instead (the images are then tagged with these names).
+services:
+  api:
+    image: ghcr.io/benjamira/tortoise-tracker-backend:latest
+    build: ./backend
+    container_name: schildkroeten-api
+    environment:
+      - DATA_DIR=/data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
+    build: ./frontend
+    container_name: schildkroeten-web
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped

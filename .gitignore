@@ -1,0 +1,19 @@
+# Runtime data (database + uploaded photos/documents) – never commit
+data/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+
+# Node / frontend build
+node_modules/
+dist/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
