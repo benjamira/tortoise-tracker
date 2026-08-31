@@ -3,7 +3,7 @@
 services:
   api:
     image: ghcr.io/benjamira/tortoise-tracker-backend:latest
-    container_name: schildkroeten-api
+    container_name: tortoise-tracker-api
     environment:
       - DATA_DIR=/data
     volumes:
@@ -12,7 +12,7 @@ services:
 
   web:
     image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
-    container_name: schildkroeten-web
+    container_name: tortoise-tracker-web
     depends_on:
       - api
     ports:

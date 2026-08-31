@@ -110,16 +110,16 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ### Variante B – `docker run`
 
 ```bash
-docker network create tortoise
+docker network create tortoise-tracker
 
-docker run -d --name tortoise-api \
-  --network tortoise --network-alias api \
+docker run -d --name tortoise-tracker-api \
+  --network tortoise-tracker --network-alias api \
   -v "$PWD/data:/data" \
   --restart unless-stopped \
   ghcr.io/benjamira/tortoise-tracker-backend:latest
 
-docker run -d --name tortoise-web \
-  --network tortoise \
+docker run -d --name tortoise-tracker-web \
+  --network tortoise-tracker \
   -p 8080:80 \
   --restart unless-stopped \
   ghcr.io/benjamira/tortoise-tracker-frontend:latest
