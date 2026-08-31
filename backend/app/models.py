@@ -28,7 +28,7 @@ class Measurement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     tortoise_id: int = Field(foreign_key="tortoise.id", index=True)
     datum: date
-    gewicht_g: Optional[int] = None
+    gewicht_g: Optional[float] = None  # eine Nachkommastelle erlaubt
     panzerlaenge_mm: Optional[int] = None
     notiz: Optional[str] = None
 

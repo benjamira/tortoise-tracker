@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { api } from "../api";
-import { formatDate } from "../format";
+import { formatDate, formatWeight, parseWeight } from "../format";
 import { useTheme } from "../theme";
 import type { Measurement } from "../types";
 
@@ -40,7 +40,9 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
-    if (!gewicht && !laenge) {
+    const g = parseWeight(gewicht);
+    const l = laenge.trim() ? Number(laenge) : null;
+    if (g == null && l == null) {
       setErr("Bitte Gewicht oder Panzerlänge eingeben.");
       return;
     }
@@ -48,8 +50,8 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
     try {
       await api.createMeasurement(tortoiseId, {
         datum: datum || today(),
-        gewicht_g: gewicht ? Number(gewicht) : null,
-        panzerlaenge_mm: laenge ? Number(laenge) : null,
+        gewicht_g: g,
+        panzerlaenge_mm: l,
       });
       setGewicht("");
       setLaenge("");
@@ -92,7 +94,8 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             <label>Gewicht (g)</label>
             <input
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="0.1"
               value={gewicht}
               onChange={(e) => setGewicht(e.target.value)}
               autoFocus
@@ -140,6 +143,9 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
               <YAxis fontSize={12} stroke={palette.muted} />
               <Tooltip
                 labelFormatter={(v) => formatDate(String(v))}
+                formatter={(v) =>
+                  metric === "gewicht_g" ? formatWeight(Number(v)) : String(v)
+                }
                 contentStyle={{
                   background: palette.panel,
                   border: `1px solid ${palette.grid}`,
@@ -177,7 +183,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             {[...rows].reverse().map((r) => (
               <tr key={r.id}>
                 <td>{formatDate(r.datum)}</td>
-                <td>{r.gewicht_g != null ? `${r.gewicht_g} g` : "–"}</td>
+                <td>{formatWeight(r.gewicht_g)}</td>
                 <td>{r.panzerlaenge_mm != null ? `${r.panzerlaenge_mm} mm` : "–"}</td>
                 <td>{r.jackson_ratio ?? "–"}</td>
                 <td>

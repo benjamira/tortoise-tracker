@@ -12,16 +12,22 @@ router = APIRouter(prefix="/api", tags=["measurements"])
 
 class MeasurementIn(BaseModel):
     datum: date
-    gewicht_g: Optional[int] = None
+    gewicht_g: Optional[float] = None  # eine Nachkommastelle
     panzerlaenge_mm: Optional[int] = None
     notiz: Optional[str] = None
 
 
 class MeasurementUpdate(BaseModel):
     datum: Optional[date] = None
-    gewicht_g: Optional[int] = None
+    gewicht_g: Optional[float] = None
     panzerlaenge_mm: Optional[int] = None
     notiz: Optional[str] = None
+
+
+def _round_weight(data: dict) -> dict:
+    if data.get("gewicht_g") is not None:
+        data["gewicht_g"] = round(float(data["gewicht_g"]), 1)
+    return data
 
 
 def _with_ratio(m: Measurement) -> dict:
@@ -47,7 +53,7 @@ def list_measurements(tid: int, session: Session = Depends(get_session)):
 def create_measurement(tid: int, payload: MeasurementIn, session: Session = Depends(get_session)):
     if not session.get(Tortoise, tid):
         raise HTTPException(404, "Schildkröte nicht gefunden")
-    m = Measurement(tortoise_id=tid, **payload.model_dump())
+    m = Measurement(tortoise_id=tid, **_round_weight(payload.model_dump()))
     session.add(m)
     session.commit()
     session.refresh(m)
@@ -59,7 +65,7 @@ def update_measurement(mid: int, payload: MeasurementUpdate, session: Session = 
     m = session.get(Measurement, mid)
     if not m:
         raise HTTPException(404, "Messung nicht gefunden")
-    for key, value in payload.model_dump(exclude_unset=True).items():
+    for key, value in _round_weight(payload.model_dump(exclude_unset=True)).items():
         setattr(m, key, value)
     session.add(m)
     session.commit()

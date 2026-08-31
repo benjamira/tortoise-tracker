@@ -51,7 +51,7 @@ class TortoiseUpdate(BaseModel):
     notizen: Optional[str] = None
 
 
-def _latest_weight(session: Session, tortoise_id: int) -> Optional[int]:
+def _latest_weight(session: Session, tortoise_id: int) -> Optional[float]:
     row = session.exec(
         select(Measurement)
         .where(Measurement.tortoise_id == tortoise_id, Measurement.gewicht_g != None)  # noqa: E711

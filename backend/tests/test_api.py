@@ -58,6 +58,17 @@ def test_measurement_ratio(client):
     assert client.get(f"/api/tortoises/{tid}").json()["aktuelles_gewicht_g"] == 400
 
 
+def test_measurement_accepts_one_decimal(client):
+    tid = client.post("/api/tortoises", json={"name": "Kilo"}).json()["id"]
+    resp = client.post(
+        f"/api/tortoises/{tid}/measurements",
+        json={"datum": "2026-02-01", "gewicht_g": 512.36},
+    )
+    assert resp.status_code == 201
+    assert resp.json()["gewicht_g"] == 512.4  # gerundet auf eine Nachkommastelle
+    assert client.get(f"/api/tortoises/{tid}/measurements").json()[0]["gewicht_g"] == 512.4
+
+
 def test_photo_upload_reads_exif_date(client):
     tid = client.post("/api/tortoises", json={"name": "Nero"}).json()["id"]
     files = {"files": ("foto.jpg", _png_bytes("2025:06:15 10:00:00"), "image/jpeg")}

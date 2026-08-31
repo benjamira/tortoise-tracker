@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { api } from "../api";
-import { formatDate } from "../format";
+import { formatDate, formatWeight } from "../format";
 import type { Tortoise } from "../types";
 import Modal from "./Modal";
 import TortoiseForm from "./TortoiseForm";
@@ -12,7 +12,7 @@ function subline(t: Tortoise): string {
     if (t.verkaufsdatum) return `verkauft ${formatDate(t.verkaufsdatum)}`;
     return "archiviert";
   }
-  return t.aktuelles_gewicht_g != null ? `${t.aktuelles_gewicht_g} g` : "kein Gewicht";
+  return t.aktuelles_gewicht_g != null ? formatWeight(t.aktuelles_gewicht_g) : "kein Gewicht";
 }
 
 function TierLink({

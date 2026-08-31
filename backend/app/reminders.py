@@ -48,7 +48,7 @@ def _latest_photo_date(session: Session, tortoise_id: int) -> date | None:
     return max(dates) if dates else None
 
 
-def _latest_weight(session: Session, tortoise_id: int) -> int | None:
+def _latest_weight(session: Session, tortoise_id: int) -> float | None:
     row = session.exec(
         select(Measurement)
         .where(Measurement.tortoise_id == tortoise_id, Measurement.gewicht_g != None)  # noqa: E711
@@ -103,7 +103,7 @@ def _check_chip(session, tortoise: Tortoise, today: date, cfg: dict) -> Reminder
         tortoise_id=tortoise.id,
         typ="chip",
         faellig_seit=today,
-        kontext=f"Aktuelles Gewicht {weight} g liegt über {cfg['chip_gewicht_schwelle_g']} g, keine Transpondernummer hinterlegt",
+        kontext=f"Aktuelles Gewicht {weight:g} g liegt über {cfg['chip_gewicht_schwelle_g']:g} g, keine Transpondernummer hinterlegt",
     )
     session.add(reminder)
     session.flush()
