@@ -97,6 +97,31 @@ curl -O https://raw.githubusercontent.com/benjamira/tortoise-tracker/main/docker
 docker compose up -d
 ```
 
+For reference, this is the `docker-compose.yml` it downloads:
+
+```yaml
+# Runs the published images from GHCR. Update with:
+#   docker compose pull && docker compose up -d
+services:
+  api:
+    image: ghcr.io/benjamira/tortoise-tracker-backend:latest
+    container_name: tortoise-tracker-api
+    environment:
+      - DATA_DIR=/data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
+    container_name: tortoise-tracker-web
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+```
+
 Then open `http://SERVER-IP:8080` in the browser.
 
 `docker compose up -d` pulls the published images from the GitHub Container
