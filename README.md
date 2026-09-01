@@ -1,5 +1,11 @@
 # 🐢 Tortoise Tracker
 
+> [!NOTE]
+> **This application was fully vibe-coded.** Every line – backend, frontend,
+> tests, CI and infrastructure – was produced by an AI assistant (Claude) from
+> natural-language prompts, with no manual code editing. Keep that in mind before
+> relying on it for anything critical.
+
 A small, self-hosted web application for documenting tortoises (built for
 Hermann's tortoises, *Testudo hermanni*). For each animal it keeps master data,
 a weight history, a photo log and an event timeline. A reminder service notifies
