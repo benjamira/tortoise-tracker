@@ -65,6 +65,13 @@ export interface TortoiseEvent {
   attachments: Attachment[];
 }
 
+export interface ReminderContext {
+  letzte_doku?: string | null;
+  intervall_monate?: number;
+  gewicht_g?: number | null;
+  schwelle_g?: number;
+}
+
 export interface Reminder {
   id: number;
   tortoise_id: number;
@@ -73,6 +80,7 @@ export interface Reminder {
   status: string;
   tier_name: string | null;
   text: string;
+  context: ReminderContext;
 }
 
 export interface Settings {

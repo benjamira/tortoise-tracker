@@ -27,6 +27,9 @@ def test_foto_reminder_for_young_tortoise(client):
     listed = client.get("/api/reminders").json()
     assert listed[0]["typ"] == "fotodokumentation"
     assert listed[0]["tier_name"] == "Jung"
+    # structured context for the frontend to localize
+    assert listed[0]["context"]["intervall_monate"] == 6
+    assert "letzte_doku" in listed[0]["context"]
 
 
 def test_chip_reminder_on_weight_threshold(client):
@@ -36,6 +39,9 @@ def test_chip_reminder_on_weight_threshold(client):
         session.commit()
         created = reminders.evaluate(session, today=date(2026, 5, 2))
     assert any(r.typ == "chip" for r in created)
+
+    chip = next(r for r in client.get("/api/reminders").json() if r["typ"] == "chip")
+    assert chip["context"] == {"gewicht_g": 520, "schwelle_g": 500}
 
     # entering a transponder number resolves the open chip reminder
     client.patch(f"/api/tortoises/{tid}", json={"transponder_nr": "276000000000123"})

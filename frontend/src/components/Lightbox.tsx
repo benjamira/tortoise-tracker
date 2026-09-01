@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { formatDate } from "../format";
+import { useT } from "../i18n";
 import type { Attachment } from "../types";
 
 export default function Lightbox({
@@ -15,6 +16,7 @@ export default function Lightbox({
   onNavigate: (i: number) => void;
   onDelete?: (a: Attachment) => void;
 }) {
+  const t = useT();
   const photo = photos[index];
 
   useEffect(() => {
@@ -34,10 +36,10 @@ export default function Lightbox({
       <div className="lb-bar" onClick={(e) => e.stopPropagation()}>
         {onDelete && (
           <button className="danger" onClick={() => onDelete(photo)}>
-            Löschen
+            {t("action.delete")}
           </button>
         )}
-        <button onClick={onClose}>Schließen</button>
+        <button onClick={onClose}>{t("action.close")}</button>
       </div>
       {index > 0 && (
         <button
@@ -63,7 +65,7 @@ export default function Lightbox({
         </button>
       )}
       <div className="cap">
-        {photo.aufnahme_datum ? formatDate(photo.aufnahme_datum) : "ohne Datum"}
+        {photo.aufnahme_datum ? formatDate(photo.aufnahme_datum) : t("fotos.noDate")}
         {photo.beschriftung ? ` · ${photo.beschriftung}` : ""}
       </div>
     </div>

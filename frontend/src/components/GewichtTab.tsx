@@ -10,19 +10,21 @@ import {
 } from "recharts";
 import { api } from "../api";
 import { formatDate, formatWeight, parseWeight } from "../format";
+import { useT } from "../i18n";
 import { useTheme } from "../theme";
 import type { Measurement } from "../types";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
 type Metric = "gewicht_g" | "panzerlaenge_mm" | "jackson_ratio";
-const METRIC_LABEL: Record<Metric, string> = {
-  gewicht_g: "Gewicht (g)",
-  panzerlaenge_mm: "Panzerlänge (mm)",
-  jackson_ratio: "Jackson-Ratio",
+const METRIC_KEY: Record<Metric, "gewicht.metricWeight" | "gewicht.metricLength" | "gewicht.metricRatio"> = {
+  gewicht_g: "gewicht.metricWeight",
+  panzerlaenge_mm: "gewicht.metricLength",
+  jackson_ratio: "gewicht.metricRatio",
 };
 
 export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: number; onChanged: () => void }) {
+  const t = useT();
   const [rows, setRows] = useState<Measurement[]>([]);
   const [metric, setMetric] = useState<Metric>("gewicht_g");
   const [datum, setDatum] = useState(today());
@@ -43,7 +45,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
     const g = parseWeight(gewicht);
     const l = laenge.trim() ? Number(laenge) : null;
     if (g == null && l == null) {
-      setErr("Bitte Gewicht oder Panzerlänge eingeben.");
+      setErr(t("gewicht.needWeightOrLength"));
       return;
     }
     setBusy(true);
@@ -59,7 +61,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
       await load();
       onChanged();
     } catch (ex) {
-      setErr(`Speichern fehlgeschlagen: ${(ex as Error).message}`);
+      setErr(t("action.saveFailed", { msg: (ex as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -70,7 +72,6 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
     .map((r) => ({ datum: r.datum, wert: r[metric] as number }));
 
   const { theme } = useTheme();
-  // Chart colours mirror the CSS palette (kept here so the SVG updates on toggle).
   const palette =
     theme === "dark"
       ? { accent: "#86a961", grid: "#3a3e32", muted: "#9ba18b", panel: "#24271f", ink: "#e7e5da" }
@@ -79,10 +80,10 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
   return (
     <>
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Neue Messung</h3>
+        <h3 style={{ marginTop: 0 }}>{t("gewicht.newMeasurement")}</h3>
         <form className="row" onSubmit={add}>
           <div className="field">
-            <label>Datum</label>
+            <label>{t("gewicht.date")}</label>
             <input
               type="date"
               required
@@ -91,7 +92,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             />
           </div>
           <div className="field">
-            <label>Gewicht (g)</label>
+            <label>{t("gewicht.weightG")}</label>
             <input
               type="number"
               inputMode="decimal"
@@ -102,7 +103,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             />
           </div>
           <div className="field">
-            <label>Panzerlänge (mm)</label>
+            <label>{t("gewicht.lengthMm")}</label>
             <input
               type="number"
               inputMode="numeric"
@@ -111,7 +112,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             />
           </div>
           <button className="primary" type="submit" disabled={busy}>
-            {busy ? "…" : "Speichern"}
+            {busy ? "…" : t("action.save")}
           </button>
         </form>
         {err && <p className="danger" style={{ margin: "8px 0 0" }}>{err}</p>}
@@ -119,14 +120,14 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
 
       <div className="card">
         <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-          {(Object.keys(METRIC_LABEL) as Metric[]).map((m) => (
+          {(Object.keys(METRIC_KEY) as Metric[]).map((m) => (
             <button
               key={m}
               type="button"
               className={metric === m ? "primary" : ""}
               onClick={() => setMetric(m)}
             >
-              {METRIC_LABEL[m]}
+              {t(METRIC_KEY[m])}
             </button>
           ))}
         </div>
@@ -156,7 +157,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
               <Line
                 type="monotone"
                 dataKey="wert"
-                name={METRIC_LABEL[metric]}
+                name={t(METRIC_KEY[metric])}
                 stroke={palette.accent}
                 strokeWidth={2}
                 dot={{ r: 3 }}
@@ -164,7 +165,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <p className="muted">Mindestens zwei Messwerte für den Graphen nötig.</p>
+          <p className="muted">{t("gewicht.needTwoPoints")}</p>
         )}
       </div>
 
@@ -172,10 +173,10 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
         <table>
           <thead>
             <tr>
-              <th>Datum</th>
-              <th>Gewicht</th>
-              <th>Panzerlänge</th>
-              <th>Jackson-Ratio</th>
+              <th>{t("gewicht.date")}</th>
+              <th>{t("gewicht.metricWeight")}</th>
+              <th>{t("gewicht.metricLength")}</th>
+              <th>{t("gewicht.metricRatio")}</th>
               <th></th>
             </tr>
           </thead>
@@ -197,11 +198,11 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
                         await load();
                         onChanged();
                       } catch (ex) {
-                        setErr(`Löschen fehlgeschlagen: ${(ex as Error).message}`);
+                        setErr(t("action.deleteFailed", { msg: (ex as Error).message }));
                       }
                     }}
                   >
-                    löschen
+                    {t("action.delete")}
                   </button>
                 </td>
               </tr>
@@ -209,7 +210,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="muted">
-                  Noch keine Messungen
+                  {t("gewicht.noMeasurements")}
                 </td>
               </tr>
             )}

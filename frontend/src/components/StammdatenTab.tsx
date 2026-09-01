@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { formatDate } from "../format";
+import { useT } from "../i18n";
 import type { Attachment, Tortoise } from "../types";
 import Modal from "./Modal";
 import TortoiseForm from "./TortoiseForm";
-
-const GESCHLECHT_LABEL: Record<string, string> = {
-  weiblich: "weiblich",
-  maennlich: "männlich",
-  unbekannt: "unbekannt",
-};
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -27,14 +22,14 @@ export default function StammdatenTab({
   tortoise: Tortoise;
   onChanged: () => void;
 }) {
+  const t = useT();
   const [editing, setEditing] = useState(false);
   const [docs, setDocs] = useState<Attachment[]>([]);
   const [pbBusy, setPbBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const pbInput = useRef<HTMLInputElement>(null);
 
-  const loadDocs = () =>
-    api.listAttachments(tortoise.id, "dokument").then(setDocs);
+  const loadDocs = () => api.listAttachments(tortoise.id, "dokument").then(setDocs);
 
   useEffect(() => {
     loadDocs();
@@ -44,7 +39,7 @@ export default function StammdatenTab({
   return (
     <>
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Profilbild</h3>
+        <h3 style={{ marginTop: 0 }}>{t("stammdaten.profilePicture")}</h3>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           {tortoise.titelbild_url ? (
             <img
@@ -79,7 +74,11 @@ export default function StammdatenTab({
               }}
             />
             <button onClick={() => pbInput.current?.click()} disabled={pbBusy}>
-              {pbBusy ? "Lädt …" : tortoise.titelbild_url ? "Bild ändern" : "Bild hochladen"}
+              {pbBusy
+                ? t("action.loading")
+                : tortoise.titelbild_url
+                  ? t("stammdaten.changeImage")
+                  : t("stammdaten.uploadImage")}
             </button>
             {tortoise.titelbild_url && (
               <button
@@ -95,7 +94,7 @@ export default function StammdatenTab({
                   }
                 }}
               >
-                Entfernen
+                {t("action.remove")}
               </button>
             )}
           </div>
@@ -104,38 +103,38 @@ export default function StammdatenTab({
 
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h3 style={{ margin: 0 }}>Stammdaten</h3>
-          <button onClick={() => setEditing(true)}>Bearbeiten</button>
+          <h3 style={{ margin: 0 }}>{t("stammdaten.masterData")}</h3>
+          <button onClick={() => setEditing(true)}>{t("action.edit")}</button>
         </div>
         <table>
           <tbody>
-            <Row label="Name" value={tortoise.name} />
-            <Row label="Unterart" value={tortoise.unterart} />
-            <Row label="Geschlecht" value={GESCHLECHT_LABEL[tortoise.geschlecht]} />
-            <Row label="Schlupfdatum" value={tortoise.schlupfdatum ? formatDate(tortoise.schlupfdatum) : ""} />
-            <Row label="Erworben am" value={tortoise.erworben_am ? formatDate(tortoise.erworben_am) : ""} />
-            <Row label="Sterbedatum" value={tortoise.sterbedatum ? formatDate(tortoise.sterbedatum) : ""} />
-            <Row label="Verkaufsdatum" value={tortoise.verkaufsdatum ? formatDate(tortoise.verkaufsdatum) : ""} />
+            <Row label={t("field.name")} value={tortoise.name} />
+            <Row label={t("field.subspecies")} value={tortoise.unterart} />
+            <Row label={t("field.sex")} value={t(`sex.${tortoise.geschlecht}`)} />
+            <Row label={t("field.hatchDate")} value={tortoise.schlupfdatum ? formatDate(tortoise.schlupfdatum) : ""} />
+            <Row label={t("field.acquiredDate")} value={tortoise.erworben_am ? formatDate(tortoise.erworben_am) : ""} />
+            <Row label={t("field.deathDate")} value={tortoise.sterbedatum ? formatDate(tortoise.sterbedatum) : ""} />
+            <Row label={t("field.saleDate")} value={tortoise.verkaufsdatum ? formatDate(tortoise.verkaufsdatum) : ""} />
             <Row
-              label="Status"
-              value={tortoise.archiviert ? "archiviert" : "aktiv"}
+              label={t("field.status")}
+              value={tortoise.archiviert ? t("status.archived") : t("status.active")}
             />
-            <Row label="CITES-/EG-Bescheinigungsnummer" value={tortoise.cites_nummer} />
+            <Row label={t("field.citesNumber")} value={tortoise.cites_nummer} />
             <Row
-              label="Transpondernummer"
-              value={tortoise.transponder_nr || <span className="muted">noch nicht gechipt</span>}
+              label={t("field.transponderNumber")}
+              value={tortoise.transponder_nr || <span className="muted">{t("form.notChipped")}</span>}
             />
-            <Row label="Herkunft" value={tortoise.herkunft} />
-            <Row label="Weitere Kennzeichen" value={tortoise.kennzeichnung} />
-            <Row label="Notizen" value={tortoise.notizen} />
+            <Row label={t("field.origin")} value={tortoise.herkunft} />
+            <Row label={t("field.marks")} value={tortoise.kennzeichnung} />
+            <Row label={t("field.notes")} value={tortoise.notizen} />
           </tbody>
         </table>
       </div>
 
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Dokumente</h3>
+        <h3 style={{ marginTop: 0 }}>{t("stammdaten.documents")}</h3>
         <p className="muted" style={{ marginTop: 0 }}>
-          CITES-Bescheinigung, Herkunftsnachweis, Tierarztberichte … (PDF/Bild)
+          {t("stammdaten.documentsHint")}
         </p>
         <input
           ref={fileInput}
@@ -164,11 +163,11 @@ export default function StammdatenTab({
                   loadDocs();
                 }}
               >
-                löschen
+                {t("action.delete")}
               </button>
             </li>
           ))}
-          {docs.length === 0 && <li className="muted">Noch keine Dokumente</li>}
+          {docs.length === 0 && <li className="muted">{t("stammdaten.noDocuments")}</li>}
         </ul>
       </div>
 
@@ -176,21 +175,21 @@ export default function StammdatenTab({
         <button
           className="danger"
           onClick={async () => {
-            if (confirm(`${tortoise.name} wirklich löschen? Alle Daten gehen verloren.`)) {
+            if (confirm(t("stammdaten.deleteConfirm", { name: tortoise.name }))) {
               await api.deleteTortoise(tortoise.id);
               onChanged();
             }
           }}
         >
-          Schildkröte löschen
+          {t("stammdaten.deleteTortoise")}
         </button>
       </div>
 
       {editing && (
-        <Modal title={`${tortoise.name} bearbeiten`} onClose={() => setEditing(false)}>
+        <Modal title={t("modal.editTortoise", { name: tortoise.name })} onClose={() => setEditing(false)}>
           <TortoiseForm
             initial={tortoise}
-            submitLabel="Speichern"
+            submitLabel={t("action.save")}
             onCancel={() => setEditing(false)}
             onSubmit={async (data) => {
               await api.updateTortoise(tortoise.id, data);

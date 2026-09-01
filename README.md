@@ -1,62 +1,63 @@
-# 🐢 Tortoise Tracker – Schildkröten-Doku
+# 🐢 Tortoise Tracker
 
-Kleine, selbst-gehostete Web­applikation zur Dokumentation von Landschildkröten
-(entwickelt für griechische Landschildkröten, *Testudo hermanni*). Pro Tier werden
-Stammdaten, Gewichts­entwicklung, eine Foto­dokumentation und eine Ereignis-Timeline
-geführt. Ein Reminder-Dienst erinnert – im Browser und per Telegram – an fällige
-Aufgaben wie eine neue Foto­dokumentation oder das Setzen eines Transponders.
+A small, self-hosted web application for documenting tortoises (built for
+Hermann's tortoises, *Testudo hermanni*). For each animal it keeps master data,
+a weight history, a photo log and an event timeline. A reminder service notifies
+you – in the browser and via Telegram – about due tasks such as a fresh photo
+documentation or fitting a transponder chip.
 
-Die Oberfläche ist deutsch­sprachig, mobil­tauglich (Eingabe am Gehege) und ohne
-Login – gedacht für den Betrieb im eigenen Heimnetz.
+The interface is available in **German and English**, works on mobile (enter data
+at the enclosure) and has no login – intended to run on your own home network.
 
 ---
 
 ## Features
 
-- **Stammdaten** je Tier: Name, Unterart, Schlupfdatum, Geschlecht, Herkunft,
-  CITES-/EG-Bescheinigungsnummer, Transpondernummer, weitere Kennzeichen,
-  Erwerbs-, Sterbe- und Verkaufsdatum, Notizen.
-- **Profilbild** – Foto-Upload, wird rund neben dem Namen und in der Seitenleiste
-  angezeigt.
-- **Gewichtsentwicklung** – Schnell­eingabe (Datum vorbelegt), Verlaufs­diagramm
-  umschaltbar zwischen Gewicht, Panzerlänge (SCL) und Jackson-Ratio, plus Tabelle.
-- **Fotodokumentation** – Upload per Drag-and-Drop (auch mehrere Dateien, inkl.
-  HEIC/iPhone). Das Aufnahmedatum wird aus den EXIF-Daten übernommen; Anzeige als
-  vertikale Zeitleiste (alt → neu) mit Thumbnails und Großansicht (Lightbox).
-- **Timeline** – Freitext-Ereignisse mit Typ: Einwinterung, Auswinterung,
-  Tierarztbesuch, Medikation, Sonstiges.
-- **Dokumentenablage** je Tier (PDF/Bild) für CITES-Bescheinigung,
-  Herkunftsnachweis, Befunde …
-- **Reminder-Dienst**
-  - *Fotodokumentation fällig* – altersabhängiges Intervall (Standard: bis 5 Jahre
-    alle 6 Monate, danach jährlich).
-  - *Chip implantieren* – sobald das aktuelle Gewicht eine Schwelle (Standard
-    500 g) überschreitet und keine Transpondernummer hinterlegt ist.
-  - Ausgabe als Popup in der App **und** einmalig als Telegram-Nachricht;
-    Erinnerungen lassen sich als *erledigt* markieren oder *vertagen*.
-  - Alle Schwellen sind im Einstellungs­menü konfigurierbar.
-- **Archiv** – Tiere mit Sterbe-/Verkaufsdatum werden aus der aktiven Liste
-  ausgeblendet und in eine ausklappbare Archiv­liste einsortiert (weiterhin voll
-  einsehbar). Für archivierte Tiere entstehen keine Reminder mehr.
-- **Sortierung** – aktive Tiere in der Seitenleiste per Drag-and-Drop ordnen.
-- **Dark-/Light-Mode** – folgt der Systemeinstellung, oben rechts umschaltbar.
-- Datumsanzeige durchgängig im Format `TT.MM.JJJJ`.
-- **Automatische Schema-Migrationen** beim Start (idempotente `ALTER TABLE` für
-  SQLite – kein Migrations­tool nötig).
+- **Master data** per animal: name, subspecies, hatch date, sex, origin,
+  CITES / EU certificate number, transponder number, other markings, acquisition,
+  death and sale dates, notes.
+- **Profile picture** – photo upload, shown as a round avatar next to the name and
+  in the sidebar.
+- **Weight history** – quick entry (date pre-filled), a trend chart switchable
+  between weight, carapace length (SCL) and Jackson ratio, plus a table.
+  Weight accepts one decimal place.
+- **Photo log** – drag-and-drop upload (multiple files, incl. HEIC/iPhone). The
+  capture date is read from the EXIF data; shown as a vertical timeline
+  (old → new) with thumbnails and a lightbox.
+- **Timeline** – free-text events typed as: start/end of hibernation, vet visit,
+  medication, other.
+- **Document store** per animal (PDF/image) for the CITES certificate, proof of
+  origin, findings, …
+- **Reminder service**
+  - *Photo documentation due* – age-dependent interval (default: every 6 months
+    up to age 5, yearly after that).
+  - *Fit a chip* – as soon as the current weight exceeds a threshold (default
+    500 g) and no transponder number is recorded.
+  - Shown as a popup in the app **and** sent once as a Telegram message;
+    reminders can be marked *done* or *snoozed*.
+  - All thresholds are configurable in the settings.
+- **Archive** – animals with a death/sale date are removed from the active list
+  and moved to a collapsible archive section (still fully accessible). Archived
+  animals no longer generate reminders.
+- **Reordering** – arrange the active animals in the sidebar via drag-and-drop.
+- **Dark / light mode** and **language (German / English)** – both selectable in
+  the top right; the defaults follow the system settings.
+- **Automatic schema migrations** on startup (idempotent `ALTER TABLE` for
+  SQLite – no migration tool required).
 
 ---
 
-## Architektur
+## Architecture
 
-Zwei Container:
+Two containers:
 
-| Dienst | Technik | Aufgabe |
-| ------ | ------- | ------- |
-| `api`  | FastAPI · SQLModel · SQLite · Pillow (+ pillow-heif) · APScheduler | REST-API unter `/api`, Datei-Uploads unter `/uploads`, Reminder-Auswertung (täglich 08:00, beim Start und bei jedem Laden der Oberfläche) |
-| `web`  | React · Vite · TypeScript · Recharts · nginx | Statisches Frontend; nginx liefert die App aus und leitet `/api` und `/uploads` an den `api`-Container weiter |
+| Service | Stack | Role |
+| ------- | ----- | ---- |
+| `api`   | FastAPI · SQLModel · SQLite · Pillow (+ pillow-heif) · APScheduler | REST API under `/api`, file uploads under `/uploads`, reminder evaluation (daily at 08:00, on startup and on every page load) |
+| `web`   | React · Vite · TypeScript · Recharts · nginx | Static frontend; nginx serves the app and proxies `/api` and `/uploads` to the `api` container |
 
 ```
-Browser ──▶ web (nginx :80) ──┬─ statische App
+Browser ──▶ web (nginx :80) ──┬─ static app
                               ├─ /api/…     ─▶ api (uvicorn :8000)
                               └─ /uploads/… ─▶ api
                                                  │
@@ -64,25 +65,25 @@ Browser ──▶ web (nginx :80) ──┬─ statische App
                                                  └  uploads/  (+ thumbs/)
 ```
 
-Alle persistenten Daten liegen im Verzeichnis **`./data`** (SQLite-Datei +
-hochgeladene Fotos/Dokumente). Es wird als Volume in den `api`-Container gemountet.
+All persistent state lives in the **`./data`** directory (SQLite file + uploaded
+photos/documents), mounted as a volume into the `api` container.
 
-### Verzeichnisstruktur
+### Repository layout
 
 ```
-backend/    FastAPI-App (app/), Tests (tests/), Dockerfile
-frontend/   React-App (src/), nginx.conf, Dockerfile
+backend/    FastAPI app (app/), tests (tests/), Dockerfile
+frontend/   React app (src/), nginx.conf, Dockerfile
 docker-compose.yml
-.github/workflows/   CI (Tests + Build) und Image-Veröffentlichung
+.github/workflows/   CI (tests + build) and image publishing
 ```
 
 ---
 
 ## Installation
 
-Voraussetzung: Docker (mit Compose-Plugin).
+Requires Docker (with the Compose plugin).
 
-### Variante A – Docker Compose (empfohlen)
+### Option A – Docker Compose (recommended)
 
 ```bash
 mkdir tortoise-tracker && cd tortoise-tracker
@@ -90,16 +91,16 @@ curl -O https://raw.githubusercontent.com/benjamira/tortoise-tracker/main/docker
 docker compose up -d
 ```
 
-Danach im Browser: `http://SERVER-IP:8080`
+Then open `http://SERVER-IP:8080` in the browser.
 
-`docker compose up -d` zieht die veröffentlichten Images von der GitHub Container
-Registry. Aktualisieren:
+`docker compose up -d` pulls the published images from the GitHub Container
+Registry. Update with:
 
 ```bash
 docker compose pull && docker compose up -d
 ```
 
-Images lokal aus dem Quellcode bauen (optional, z. B. für Entwicklung):
+Build the images locally from source (optional, e.g. for development):
 
 ```bash
 git clone https://github.com/benjamira/tortoise-tracker.git
@@ -107,7 +108,7 @@ cd tortoise-tracker
 docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ```
 
-### Variante B – `docker run`
+### Option B – `docker run`
 
 ```bash
 docker network create tortoise-tracker
@@ -125,49 +126,52 @@ docker run -d --name tortoise-tracker-web \
   ghcr.io/benjamira/tortoise-tracker-frontend:latest
 ```
 
-Wichtig: Der Backend-Container muss im Netzwerk als **`api`** erreichbar sein
-(`--network-alias api`), da nginx dorthin weiterleitet.
+Important: the backend container must be reachable as **`api`** on the network
+(`--network-alias api`), because that is where nginx proxies to.
 
 ---
 
-## Konfiguration
+## Configuration
 
-| Einstellung | Wo | Standard |
-| ----------- | -- | -------- |
-| Host-Port des Frontends | `ports:` in `docker-compose.yml` bzw. `-p` | `8080:80` |
-| Datenverzeichnis im Container | Env `DATA_DIR` am `api`-Container | `/data` |
-| Telegram Bot-Token & Chat-/Channel-ID | Oberfläche → **Einstellungen** | – |
-| Foto-Intervalle, Altersgrenze, Chip-Gewichtsschwelle | Oberfläche → **Einstellungen** | 6 / 12 Monate, 5 Jahre, 500 g |
-| Reminder je Typ ein-/ausschalten | Oberfläche → **Einstellungen** | an |
+| Setting | Where | Default |
+| ------- | ----- | ------- |
+| Frontend host port | `ports:` in `docker-compose.yml` / `-p` | `8080:80` |
+| Data directory in the container | env `DATA_DIR` on the `api` container | `/data` |
+| Telegram bot token & chat/channel ID | UI → **Settings** | – |
+| Photo intervals, age limit, chip weight threshold | UI → **Settings** | 6 / 12 months, 5 years, 500 g |
+| Enable/disable each reminder type | UI → **Settings** | on |
+| Language & theme | top-right of the UI (per browser) | follows system settings |
 
-### Telegram einrichten
+### Setting up Telegram
 
-1. Bei [@BotFather](https://t.me/BotFather) einen Bot anlegen und den Token kopieren.
-2. Chat-/Channel-ID des Ziels ermitteln (eigene numerische ID oder `@kanalname`;
-   den Bot vorher der Gruppe/dem Kanal hinzufügen).
-3. Unter **Einstellungen** eintragen und **„Testnachricht senden“** prüfen.
+1. Create a bot with [@BotFather](https://t.me/BotFather) and copy the token.
+2. Determine the target chat/channel ID (your own numeric ID or `@channelname`;
+   add the bot to the group/channel first).
+3. Enter both under **Settings** and verify with **"Send test message"**.
+
+Telegram messages are always sent in German, regardless of the UI language.
 
 ---
 
-## Backup & Wiederherstellung
+## Backup & restore
 
-Der gesamte Zustand steckt im `data/`-Verzeichnis.
+The entire state is contained in the `data/` directory.
 
 ```bash
-# Sichern
+# Backup
 tar czf tortoise-backup-$(date +%F).tgz data/
 
-# Wiederherstellen
+# Restore
 tar xzf tortoise-backup-YYYY-MM-DD.tgz
 docker compose up -d
 ```
 
-Schema-Anpassungen neuerer Versionen werden beim Start automatisch und idempotent
-angewandt.
+Schema changes from newer versions are applied automatically and idempotently on
+startup.
 
 ---
 
-## Entwicklung
+## Development
 
 **Backend**
 
@@ -175,7 +179,7 @@ angewandt.
 cd backend
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
 DATA_DIR=./data .venv/bin/uvicorn app.main:app --reload   # http://localhost:8000
-.venv/bin/python -m pytest                                # Tests
+.venv/bin/python -m pytest                                # tests
 ```
 
 **Frontend**
@@ -183,38 +187,46 @@ DATA_DIR=./data .venv/bin/uvicorn app.main:app --reload   # http://localhost:800
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:5173, /api + /uploads werden auf :8000 geproxyt
-npm run build      # Typecheck (tsc) + Produktions-Build
+npm run dev        # http://localhost:5173, /api + /uploads proxied to :8000
+npm run build      # type check (tsc) + production build
 ```
+
+### Adding a language
+
+1. Copy `frontend/src/i18n/messages/de.ts` to `<code>.ts` and translate every value.
+2. Add the code to the `Lang` type and one entry to `LOCALES` in
+   `frontend/src/i18n/config.ts`.
+
+`de.ts` is the source of truth – TypeScript fails the build if any locale is
+missing a key.
 
 ---
 
 ## CI/CD
 
-| Workflow | Auslöser | Zweck |
-| -------- | -------- | ----- |
-| `.github/workflows/ci.yml` | Push auf `main`, Pull Requests | Backend-Tests (pytest) und Frontend-Build/Typecheck |
-| `.github/workflows/docker.yml` | Push auf `main`, Tags `v*`, manuell | Baut **Multi-Arch-Images** (`linux/amd64`, `linux/arm64`) und veröffentlicht sie in der GitHub Container Registry |
+| Workflow | Trigger | Purpose |
+| -------- | ------- | ------- |
+| `.github/workflows/ci.yml` | push to `main`, pull requests | backend tests (pytest) and frontend build / type check |
+| `.github/workflows/docker.yml` | push to `main`, tags `v*`, manual | builds **multi-arch images** (`linux/amd64`, `linux/arm64`) and publishes them to the GitHub Container Registry |
 
-Veröffentlichte Images:
+Published images:
 
 - `ghcr.io/benjamira/tortoise-tracker-backend`
 - `ghcr.io/benjamira/tortoise-tracker-frontend`
 
-Tags: `latest` (letzter `main`-Stand), `sha-<kurz>` je Commit, sowie `X.Y.Z` /
-`X.Y` bei einem Release-Tag `vX.Y.Z`.
+Tags: `latest` (latest `main`), `sha-<short>` per commit, plus `X.Y.Z` / `X.Y`
+for a release tag `vX.Y.Z`.
 
 ---
 
-## Sicherheit
+## Security
 
-Die Anwendung hat **keine Authentifizierung** und ist für den Betrieb in einem
-vertrauens­würdigen Heimnetz gedacht. Nicht ungeschützt ins Internet stellen –
-bei Bedarf einen Reverse-Proxy mit Zugriffsschutz (Basic-Auth, VPN, o. Ä.)
-davorschalten.
+The application has **no authentication** and is meant to run on a trusted home
+network. Do not expose it to the internet unprotected – put a reverse proxy with
+access control (basic auth, VPN, etc.) in front of it if needed.
 
 ---
 
-## Lizenz
+## License
 
-Bislang keine Lizenz festgelegt.
+No license has been chosen yet.

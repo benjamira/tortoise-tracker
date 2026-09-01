@@ -68,16 +68,19 @@ def message_for(session: Session, reminder: Reminder) -> str:
     return f"🐢 {name}: Erinnerung ({reminder.typ}).{ctx}"
 
 
+def photo_interval_months(tortoise: Tortoise, today: date, cfg: dict) -> int:
+    if tortoise.schlupfdatum and _age_years(tortoise.schlupfdatum, today) < cfg["foto_alter_grenze_jahre"]:
+        return cfg["foto_intervall_jung_monate"]
+    return cfg["foto_intervall_alt_monate"]
+
+
 def _check_foto(session, tortoise: Tortoise, today: date, cfg: dict) -> Reminder | None:
     if _open_reminder(session, tortoise.id, "fotodokumentation"):
         return None
     ref = _latest_photo_date(session, tortoise.id) or tortoise.schlupfdatum or tortoise.erworben_am
     if ref is None:
         return None
-    if tortoise.schlupfdatum and _age_years(tortoise.schlupfdatum, today) < cfg["foto_alter_grenze_jahre"]:
-        interval = cfg["foto_intervall_jung_monate"]
-    else:
-        interval = cfg["foto_intervall_alt_monate"]
+    interval = photo_interval_months(tortoise, today, cfg)
     if _add_months(ref, interval) > today:
         return None
     reminder = Reminder(

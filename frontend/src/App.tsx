@@ -5,6 +5,7 @@ import type { Tortoise } from "./types";
 import Sidebar from "./components/Sidebar";
 import ReminderBanner from "./components/ReminderBanner";
 import ThemeToggle from "./components/ThemeToggle";
+import LanguageSelect from "./components/LanguageSelect";
 
 export interface AppContext {
   tortoises: Tortoise[];
@@ -27,7 +28,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <ThemeToggle />
+      <div className="top-controls">
+        <LanguageSelect />
+        <ThemeToggle />
+      </div>
       <Sidebar
         tortoises={tortoises}
         onCreated={async (t) => {

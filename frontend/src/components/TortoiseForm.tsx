@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "../i18n";
 import type { Tortoise } from "../types";
 
 type Draft = Partial<Tortoise>;
@@ -16,6 +17,7 @@ export default function TortoiseForm({
   onSubmit: (data: Draft) => Promise<void>;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [draft, setDraft] = useState<Draft>(initial ?? EMPTY);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function TortoiseForm({
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.name?.trim()) {
-      setErr("Name ist erforderlich.");
+      setErr(t("form.nameError"));
       return;
     }
     setBusy(true);
@@ -59,40 +61,40 @@ export default function TortoiseForm({
   return (
     <form onSubmit={submit}>
       <div className="field">
-        <label>Name *</label>
+        <label>{t("field.name")} *</label>
         <input value={draft.name ?? ""} onChange={set("name")} autoFocus />
       </div>
       <div className="grid2">
         <div className="field">
-          <label>Unterart</label>
+          <label>{t("field.subspecies")}</label>
           <input
             value={draft.unterart ?? ""}
             onChange={set("unterart")}
-            placeholder="z.B. Testudo hermanni boettgeri"
+            placeholder={t("form.subspeciesPlaceholder")}
           />
         </div>
         <div className="field">
-          <label>Geschlecht</label>
+          <label>{t("field.sex")}</label>
           <select value={draft.geschlecht ?? "unbekannt"} onChange={set("geschlecht")}>
-            <option value="unbekannt">unbekannt</option>
-            <option value="weiblich">weiblich</option>
-            <option value="maennlich">männlich</option>
+            <option value="unbekannt">{t("sex.unbekannt")}</option>
+            <option value="weiblich">{t("sex.weiblich")}</option>
+            <option value="maennlich">{t("sex.maennlich")}</option>
           </select>
         </div>
         <div className="field">
-          <label>Schlupfdatum</label>
+          <label>{t("field.hatchDate")}</label>
           <input type="date" value={draft.schlupfdatum ?? ""} onChange={set("schlupfdatum")} />
         </div>
         <div className="field">
-          <label>Erworben am</label>
+          <label>{t("field.acquiredDate")}</label>
           <input type="date" value={draft.erworben_am ?? ""} onChange={set("erworben_am")} />
         </div>
         <div className="field">
-          <label>Sterbedatum</label>
+          <label>{t("field.deathDate")}</label>
           <input type="date" value={draft.sterbedatum ?? ""} onChange={setEndDate("sterbedatum")} />
         </div>
         <div className="field">
-          <label>Verkaufsdatum</label>
+          <label>{t("field.saleDate")}</label>
           <input
             type="date"
             value={draft.verkaufsdatum ?? ""}
@@ -100,28 +102,28 @@ export default function TortoiseForm({
           />
         </div>
         <div className="field">
-          <label>CITES-/EG-Bescheinigungsnummer</label>
+          <label>{t("field.citesNumber")}</label>
           <input value={draft.cites_nummer ?? ""} onChange={set("cites_nummer")} />
         </div>
         <div className="field">
-          <label>Transpondernummer</label>
+          <label>{t("field.transponderNumber")}</label>
           <input
             value={draft.transponder_nr ?? ""}
             onChange={set("transponder_nr")}
-            placeholder="leer = noch nicht gechipt"
+            placeholder={t("form.transponderPlaceholder")}
           />
         </div>
       </div>
       <div className="field">
-        <label>Herkunft</label>
+        <label>{t("field.origin")}</label>
         <input value={draft.herkunft ?? ""} onChange={set("herkunft")} />
       </div>
       <div className="field">
-        <label>Weitere Kennzeichen</label>
+        <label>{t("field.marks")}</label>
         <input value={draft.kennzeichnung ?? ""} onChange={set("kennzeichnung")} />
       </div>
       <div className="field">
-        <label>Notizen</label>
+        <label>{t("field.notes")}</label>
         <textarea rows={3} value={draft.notizen ?? ""} onChange={set("notizen")} />
       </div>
       {(draft.sterbedatum || draft.verkaufsdatum) && (
@@ -135,14 +137,14 @@ export default function TortoiseForm({
                 setDraft((d) => ({ ...d, archiviert: e.target.checked }) as Draft)
               }
             />
-            Tier archivieren – wird in der Seitenleiste unter „Archiv“ einsortiert
+            {t("form.archiveHint")}
           </label>
         </div>
       )}
       {err && <p className="danger">{err}</p>}
       <div className="modal-actions">
         <button type="button" onClick={onCancel}>
-          Abbrechen
+          {t("action.cancel")}
         </button>
         <button type="submit" className="primary" disabled={busy}>
           {busy ? "…" : submitLabel}

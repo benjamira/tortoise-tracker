@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Schildkröten-Doku</title>
     <script>
-      // Apply the saved/system theme before first paint to avoid a flash.
+      // Apply the saved/system theme and language before first paint.
       try {
         var t = localStorage.getItem("theme");
         if (t !== "light" && t !== "dark") {
           t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.dataset.theme = t;
+      } catch (e) {}
+      try {
+        var l = localStorage.getItem("lang");
+        if (l !== "de" && l !== "en") l = (navigator.language || "de").slice(0, 2);
+        document.documentElement.lang = l === "en" ? "en" : "de";
       } catch (e) {}
     </script>
   </head>

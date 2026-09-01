@@ -5,6 +5,7 @@ import App from "./App";
 import TortoiseDetail from "./pages/TortoiseDetail";
 import Settings from "./pages/Settings";
 import { ThemeProvider } from "./theme";
+import { I18nProvider } from "./i18n";
 import "./styles.css";
 
 const router = createBrowserRouter([
@@ -22,8 +23,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <I18nProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </I18nProvider>
   </React.StrictMode>,
 );

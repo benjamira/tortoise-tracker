@@ -3,22 +3,18 @@ import { useOutletContext, useParams } from "react-router-dom";
 import type { AppContext } from "../App";
 import { api } from "../api";
 import { formatDate } from "../format";
+import { useT } from "../i18n";
 import type { Tortoise } from "../types";
 import StammdatenTab from "../components/StammdatenTab";
 import GewichtTab from "../components/GewichtTab";
 import FotosTab from "../components/FotosTab";
 import TimelineTab from "../components/TimelineTab";
 
-const TABS = [
-  { key: "stammdaten", label: "Stammdaten" },
-  { key: "gewicht", label: "Gewichtsentwicklung" },
-  { key: "fotos", label: "Fotodokumentation" },
-  { key: "timeline", label: "Timeline" },
-] as const;
-
-type TabKey = (typeof TABS)[number]["key"];
+const TABS = ["stammdaten", "gewicht", "fotos", "timeline"] as const;
+type TabKey = (typeof TABS)[number];
 
 export default function TortoiseDetail() {
+  const t = useT();
   const { id } = useParams();
   const { tortoises, reloadTortoises } = useOutletContext<AppContext>();
   const [tab, setTab] = useState<TabKey>("stammdaten");
@@ -37,17 +33,15 @@ export default function TortoiseDetail() {
   if (!id) {
     return (
       <div className="card">
-        <h2>Willkommen</h2>
+        <h2>{t("detail.welcome")}</h2>
         <p className="muted">
-          {tortoises.length
-            ? "Wähle links eine Schildkröte aus."
-            : "Lege links über „＋ Schildkröte hinzufügen“ deine erste Schildkröte an."}
+          {tortoises.length ? t("detail.selectHint") : t("detail.createHint")}
         </p>
       </div>
     );
   }
 
-  if (!tortoise) return <p className="muted">Lädt …</p>;
+  if (!tortoise) return <p className="muted">{t("action.loading")}</p>;
 
   return (
     <div>
@@ -70,25 +64,27 @@ export default function TortoiseDetail() {
             {tortoise.name}
             {tortoise.archiviert && (
               <span className="pill" style={{ marginLeft: 10, verticalAlign: "middle" }}>
-                archiviert
+                {t("status.archived")}
               </span>
             )}
           </h2>
           <div className="muted">
-            {tortoise.unterart ?? "Unterart unbekannt"}
-            {tortoise.schlupfdatum ? ` · geschlüpft ${formatDate(tortoise.schlupfdatum)}` : ""}
+            {tortoise.unterart ?? t("detail.subspeciesUnknown")}
+            {tortoise.schlupfdatum
+              ? ` · ${t("detail.hatched", { date: formatDate(tortoise.schlupfdatum) })}`
+              : ""}
           </div>
         </div>
       </div>
 
       <div className="tabs">
-        {TABS.map((t) => (
+        {TABS.map((k) => (
           <button
-            key={t.key}
-            className={tab === t.key ? "active" : ""}
-            onClick={() => setTab(t.key)}
+            key={k}
+            className={tab === k ? "active" : ""}
+            onClick={() => setTab(k)}
           >
-            {t.label}
+            {t(`tab.${k}`)}
           </button>
         ))}
       </div>

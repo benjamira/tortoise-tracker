@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { formatDate } from "../format";
+import { useT } from "../i18n";
 import type { EventTyp, TortoiseEvent } from "../types";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const TYP_LABEL: Record<EventTyp, string> = {
-  einwinterung: "Einwinterung",
-  auswinterung: "Auswinterung",
-  tierarzt: "Tierarztbesuch",
-  medikation: "Medikation",
-  sonstiges: "Sonstiges",
-};
+const EVENT_TYPES: EventTyp[] = [
+  "einwinterung",
+  "auswinterung",
+  "tierarzt",
+  "medikation",
+  "sonstiges",
+];
 
 export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
+  const t = useT();
   const [events, setEvents] = useState<TortoiseEvent[]>([]);
   const [datum, setDatum] = useState(today());
   const [typ, setTyp] = useState<EventTyp>("tierarzt");
@@ -39,7 +41,7 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
       setDatum(today());
       await load();
     } catch (ex) {
-      setErr(`Speichern fehlgeschlagen: ${(ex as Error).message}`);
+      setErr(t("action.saveFailed", { msg: (ex as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -48,11 +50,11 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
   return (
     <>
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Ereignis hinzufügen</h3>
+        <h3 style={{ marginTop: 0 }}>{t("timeline.addEvent")}</h3>
         <form onSubmit={add}>
           <div className="row">
             <div className="field">
-              <label>Datum</label>
+              <label>{t("gewicht.date")}</label>
               <input
                 type="date"
                 required
@@ -61,38 +63,38 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
               />
             </div>
             <div className="field">
-              <label>Typ</label>
+              <label>{t("timeline.type")}</label>
               <select value={typ} onChange={(e) => setTyp(e.target.value as EventTyp)}>
-                {(Object.keys(TYP_LABEL) as EventTyp[]).map((t) => (
-                  <option key={t} value={t}>
-                    {TYP_LABEL[t]}
+                {EVENT_TYPES.map((et) => (
+                  <option key={et} value={et}>
+                    {t(`eventType.${et}`)}
                   </option>
                 ))}
               </select>
             </div>
           </div>
           <div className="field">
-            <label>Notiz (Freitext, optional)</label>
+            <label>{t("timeline.note")}</label>
             <textarea
               rows={3}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="z.B. Kontrolle bei Dr. …, Panacur 1×, Kotprobe o.B."
+              placeholder={t("timeline.notePlaceholder")}
             />
           </div>
           {err && <p className="danger" style={{ margin: "0 0 8px" }}>{err}</p>}
           <button className="primary" type="submit" disabled={busy}>
-            {busy ? "…" : "Eintragen"}
+            {busy ? "…" : t("timeline.submit")}
           </button>
         </form>
       </div>
 
       <div className="card">
-        {events.length === 0 && <p className="muted">Noch keine Ereignisse.</p>}
+        {events.length === 0 && <p className="muted">{t("timeline.noEvents")}</p>}
         {events.map((ev) => (
           <div className="event" key={ev.id}>
             <div className="when">
-              {formatDate(ev.datum)} · <span className="pill">{TYP_LABEL[ev.typ]}</span>
+              {formatDate(ev.datum)} · <span className="pill">{t(`eventType.${ev.typ}`)}</span>
             </div>
             {editId === ev.id ? (
               <>
@@ -108,20 +110,22 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
                         setEditId(null);
                         await load();
                       } catch (ex) {
-                        setErr(`Speichern fehlgeschlagen: ${(ex as Error).message}`);
+                        setErr(t("action.saveFailed", { msg: (ex as Error).message }));
                       }
                     }}
                   >
-                    Speichern
+                    {t("action.save")}
                   </button>
                   <button type="button" onClick={() => setEditId(null)}>
-                    Abbrechen
+                    {t("action.cancel")}
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <p className="txt">{ev.text || <span className="muted">(keine Notiz)</span>}</p>
+                <p className="txt">
+                  {ev.text || <span className="muted">{t("timeline.noNote")}</span>}
+                </p>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
                     type="button"
@@ -131,7 +135,7 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
                       setEditText(ev.text);
                     }}
                   >
-                    bearbeiten
+                    {t("action.edit")}
                   </button>
                   <button
                     type="button"
@@ -142,11 +146,11 @@ export default function TimelineTab({ tortoiseId }: { tortoiseId: number }) {
                         await api.deleteEvent(ev.id);
                         await load();
                       } catch (ex) {
-                        setErr(`Löschen fehlgeschlagen: ${(ex as Error).message}`);
+                        setErr(t("action.deleteFailed", { msg: (ex as Error).message }));
                       }
                     }}
                   >
-                    löschen
+                    {t("action.delete")}
                   </button>
                 </div>
               </>

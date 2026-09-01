@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { formatDate } from "../format";
+import { useT } from "../i18n";
 import type { Attachment } from "../types";
 import Lightbox from "./Lightbox";
 
@@ -11,6 +12,7 @@ export default function FotosTab({
   tortoiseId: number;
   onChanged: () => void;
 }) {
+  const t = useT();
   const [photos, setPhotos] = useState<Attachment[]>([]);
   const [drag, setDrag] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -58,14 +60,14 @@ export default function FotosTab({
         }}
       >
         {busy ? (
-          "Lädt hoch …"
+          t("fotos.uploading")
         ) : (
           <>
-            Fotos hierher ziehen oder{" "}
+            {t("fotos.dropPrefix")}
             <label
               style={{ display: "inline", color: "var(--accent-dark)", textDecoration: "underline", cursor: "pointer" }}
             >
-              auswählen
+              {t("fotos.browse")}
               <input
                 type="file"
                 multiple
@@ -74,14 +76,14 @@ export default function FotosTab({
                 onChange={(e) => upload(Array.from(e.target.files ?? []))}
               />
             </label>
-            . Das Aufnahmedatum wird aus den EXIF-Daten übernommen.
+            {t("fotos.dropSuffix")}
           </>
         )}
       </div>
 
       {photos.length === 0 ? (
         <p className="muted" style={{ marginTop: 20 }}>
-          Noch keine Fotos in der Dokumentation.
+          {t("fotos.noPhotos")}
         </p>
       ) : (
         <div className="photo-timeline" style={{ marginTop: 22 }}>
@@ -94,7 +96,7 @@ export default function FotosTab({
                 onClick={() => setLightbox(i)}
               />
               <div>
-                <strong>{p.aufnahme_datum ? formatDate(p.aufnahme_datum) : "ohne Datum"}</strong>
+                <strong>{p.aufnahme_datum ? formatDate(p.aufnahme_datum) : t("fotos.noDate")}</strong>
                 <div className="muted" style={{ fontSize: "0.82rem" }}>
                   {p.originalname}
                 </div>

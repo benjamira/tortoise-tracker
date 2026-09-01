@@ -2,24 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { api } from "../api";
 import { formatDate, formatWeight } from "../format";
+import { useT } from "../i18n";
 import type { Tortoise } from "../types";
 import Modal from "./Modal";
 import TortoiseForm from "./TortoiseForm";
 
-function subline(t: Tortoise): string {
-  if (t.archiviert) {
-    if (t.sterbedatum) return `† ${formatDate(t.sterbedatum)}`;
-    if (t.verkaufsdatum) return `verkauft ${formatDate(t.verkaufsdatum)}`;
-    return "archiviert";
-  }
-  return t.aktuelles_gewicht_g != null ? formatWeight(t.aktuelles_gewicht_g) : "kein Gewicht";
-}
-
 function TierLink({
-  t,
+  tortoise: tt,
   drag,
 }: {
-  t: Tortoise;
+  tortoise: Tortoise;
   drag?: {
     onStart: (e: React.DragEvent) => void;
     onEnter: () => void;
@@ -27,9 +19,19 @@ function TierLink({
     active: boolean;
   };
 }) {
+  const t = useT();
+  let sub: string;
+  if (tt.archiviert) {
+    if (tt.sterbedatum) sub = t("sidebar.died", { date: formatDate(tt.sterbedatum) });
+    else if (tt.verkaufsdatum) sub = t("sidebar.sold", { date: formatDate(tt.verkaufsdatum) });
+    else sub = t("sidebar.archived");
+  } else {
+    sub = tt.aktuelles_gewicht_g != null ? formatWeight(tt.aktuelles_gewicht_g) : t("sidebar.noWeight");
+  }
+
   return (
     <NavLink
-      to={`/tiere/${t.id}`}
+      to={`/tiere/${tt.id}`}
       draggable={!!drag}
       onDragStart={drag?.onStart}
       onDragEnter={drag?.onEnter}
@@ -40,18 +42,18 @@ function TierLink({
       }
     >
       {drag && (
-        <span className="drag-handle" title="Zum Sortieren ziehen">
+        <span className="drag-handle" title={t("sidebar.dragToSort")}>
           ⠿
         </span>
       )}
-      {t.titelbild_url ? (
-        <img className="avatar" src={t.titelbild_url} alt="" />
+      {tt.titelbild_url ? (
+        <img className="avatar" src={tt.titelbild_url} alt="" />
       ) : (
         <span className="avatar">🐢</span>
       )}
       <span className="meta">
-        <span className="nm">{t.name}</span>
-        <span className="sub">{subline(t)}</span>
+        <span className="nm">{tt.name}</span>
+        <span className="sub">{sub}</span>
       </span>
     </NavLink>
   );
@@ -64,10 +66,11 @@ export default function Sidebar({
   tortoises: Tortoise[];
   onCreated: (t: Tortoise) => void;
 }) {
+  const t = useT();
   const [showCreate, setShowCreate] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
 
-  const archived = tortoises.filter((t) => t.archiviert);
+  const archived = tortoises.filter((x) => x.archiviert);
 
   // Local, reorderable copy of the active tortoises.
   const [order, setOrder] = useState<Tortoise[]>([]);
@@ -75,7 +78,7 @@ export default function Sidebar({
   const dragFrom = useRef<number | null>(null);
 
   useEffect(() => {
-    setOrder(tortoises.filter((t) => !t.archiviert));
+    setOrder(tortoises.filter((x) => !x.archiviert));
   }, [tortoises]);
 
   const onEnter = (index: number) => {
@@ -94,7 +97,7 @@ export default function Sidebar({
     dragFrom.current = null;
     setDraggingId(null);
     try {
-      await api.reorderTortoises(order.map((t) => t.id));
+      await api.reorderTortoises(order.map((x) => x.id));
     } catch {
       /* keep local order; a later reload reconciles */
     }
@@ -102,19 +105,19 @@ export default function Sidebar({
 
   return (
     <nav className="sidebar">
-      <h1>🐢 Schildkröten-Doku</h1>
+      <h1>🐢 {t("app.title")}</h1>
 
-      {order.map((t, i) => (
+      {order.map((tortoise, i) => (
         <TierLink
-          key={t.id}
-          t={t}
+          key={tortoise.id}
+          tortoise={tortoise}
           drag={{
-            active: draggingId === t.id,
+            active: draggingId === tortoise.id,
             onStart: (e) => {
               e.dataTransfer.effectAllowed = "move";
-              e.dataTransfer.setData("text/plain", String(t.id));
+              e.dataTransfer.setData("text/plain", String(tortoise.id));
               dragFrom.current = i;
-              setDraggingId(t.id);
+              setDraggingId(tortoise.id);
             },
             onEnter: () => onEnter(i),
             onEnd,
@@ -125,16 +128,17 @@ export default function Sidebar({
       <button className="tier-item" onClick={() => setShowCreate(true)}>
         <span className="avatar">＋</span>
         <span className="meta">
-          <span className="nm">Schildkröte hinzufügen</span>
+          <span className="nm">{t("sidebar.addTortoise")}</span>
         </span>
       </button>
 
       {archived.length > 0 && (
         <div className="archive-block">
           <button className="archive-toggle" onClick={() => setArchiveOpen((v) => !v)}>
-            {archiveOpen ? "▾" : "▸"} Archiv ({archived.length})
+            {archiveOpen ? "▾" : "▸"} {t("sidebar.archive")} ({archived.length})
           </button>
-          {archiveOpen && archived.map((t) => <TierLink key={t.id} t={t} />)}
+          {archiveOpen &&
+            archived.map((tortoise) => <TierLink key={tortoise.id} tortoise={tortoise} />)}
         </div>
       )}
 
@@ -145,14 +149,14 @@ export default function Sidebar({
       >
         <span className="avatar">⚙️</span>
         <span className="meta">
-          <span className="nm">Einstellungen</span>
+          <span className="nm">{t("sidebar.settings")}</span>
         </span>
       </NavLink>
 
       {showCreate && (
-        <Modal title="Neue Schildkröte" onClose={() => setShowCreate(false)}>
+        <Modal title={t("modal.newTortoise")} onClose={() => setShowCreate(false)}>
           <TortoiseForm
-            submitLabel="Anlegen"
+            submitLabel={t("action.create")}
             onCancel={() => setShowCreate(false)}
             onSubmit={async (data) => {
               const created = await api.createTortoise(data);
