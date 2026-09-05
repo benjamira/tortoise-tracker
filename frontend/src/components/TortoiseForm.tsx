@@ -5,6 +5,7 @@ import type { Tortoise } from "../types";
 type Draft = Partial<Tortoise>;
 
 const EMPTY: Draft = { name: "", geschlecht: "unbekannt" };
+const NACHZUCHT_HERKUNFT = "Moosbach (Deutschland)";
 
 export default function TortoiseForm({
   initial,
@@ -116,7 +117,30 @@ export default function TortoiseForm({
       </div>
       <div className="field">
         <label>{t("field.origin")}</label>
-        <input value={draft.herkunft ?? ""} onChange={set("herkunft")} />
+        <input
+          value={draft.herkunft ?? ""}
+          onChange={set("herkunft")}
+          readOnly={Boolean(draft.eigene_nachzucht)}
+          style={draft.eigene_nachzucht ? { background: "var(--highlight-bg)" } : undefined}
+        />
+        <label style={{ marginTop: 6, marginBottom: 0 }}>
+          <input
+            type="checkbox"
+            style={{ width: "auto", marginRight: 6 }}
+            checked={Boolean(draft.eigene_nachzucht)}
+            onChange={(e) =>
+              setDraft(
+                (d) =>
+                  ({
+                    ...d,
+                    eigene_nachzucht: e.target.checked,
+                    herkunft: e.target.checked ? NACHZUCHT_HERKUNFT : d.herkunft,
+                  }) as Draft,
+              )
+            }
+          />
+          {t("field.ownBreeding")}
+        </label>
       </div>
       <div className="field">
         <label>{t("field.marks")}</label>

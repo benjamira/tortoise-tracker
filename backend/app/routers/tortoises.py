@@ -13,6 +13,9 @@ from ..storage import thumb_name
 
 router = APIRouter(prefix="/api/tortoises", tags=["tortoises"])
 
+# When "eigene Nachzucht" is set, origin is fixed to this value.
+NACHZUCHT_HERKUNFT = "Moosbach (Deutschland)"
+
 
 class TortoiseIn(BaseModel):
     name: str
@@ -20,6 +23,7 @@ class TortoiseIn(BaseModel):
     schlupfdatum: Optional[date] = None
     geschlecht: str = "unbekannt"
     herkunft: Optional[str] = None
+    eigene_nachzucht: bool = False
     cites_nummer: Optional[str] = None
     transponder_nr: Optional[str] = None
     kennzeichnung: Optional[str] = None
@@ -40,6 +44,7 @@ class TortoiseUpdate(BaseModel):
     schlupfdatum: Optional[date] = None
     geschlecht: Optional[str] = None
     herkunft: Optional[str] = None
+    eigene_nachzucht: Optional[bool] = None
     cites_nummer: Optional[str] = None
     transponder_nr: Optional[str] = None
     kennzeichnung: Optional[str] = None
@@ -92,6 +97,8 @@ def list_tortoises(session: Session = Depends(get_session)):
 @router.post("", status_code=201)
 def create_tortoise(payload: TortoiseIn, session: Session = Depends(get_session)):
     t = Tortoise(**payload.model_dump())
+    if t.eigene_nachzucht:
+        t.herkunft = NACHZUCHT_HERKUNFT
     max_pos = session.exec(select(func.max(Tortoise.sortierung))).first()
     t.sortierung = (max_pos or 0) + 1
     session.add(t)
@@ -131,6 +138,8 @@ def update_tortoise(tid: int, payload: TortoiseUpdate, session: Session = Depend
         raise HTTPException(404, "Schildkröte nicht gefunden")
     for key, value in payload.model_dump(exclude_unset=True).items():
         setattr(t, key, value)
+    if t.eigene_nachzucht:
+        t.herkunft = NACHZUCHT_HERKUNFT
     session.add(t)
     session.commit()
     session.refresh(t)

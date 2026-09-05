@@ -125,6 +125,10 @@ export default function StammdatenTab({
               value={tortoise.transponder_nr || <span className="muted">{t("form.notChipped")}</span>}
             />
             <Row label={t("field.origin")} value={tortoise.herkunft} />
+            <Row
+              label={t("field.ownBreeding")}
+              value={tortoise.eigene_nachzucht ? t("common.yes") : t("common.no")}
+            />
             <Row label={t("field.marks")} value={tortoise.kennzeichnung} />
             <Row label={t("field.notes")} value={tortoise.notizen} />
           </tbody>

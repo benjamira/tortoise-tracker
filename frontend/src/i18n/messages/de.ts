@@ -12,6 +12,8 @@ export const de = {
   "action.create": "Anlegen",
   "action.loading": "Lädt …",
   "action.saved": "Gespeichert.",
+  "common.yes": "Ja",
+  "common.no": "Nein",
   "action.saveFailed": "Speichern fehlgeschlagen: {msg}",
   "action.deleteFailed": "Löschen fehlgeschlagen: {msg}",
 
@@ -46,6 +48,7 @@ export const de = {
   "field.citesNumber": "CITES-/EG-Bescheinigungsnummer",
   "field.transponderNumber": "Transpondernummer",
   "field.origin": "Herkunft",
+  "field.ownBreeding": "Eigene Nachzucht",
   "field.marks": "Weitere Kennzeichen",
   "field.notes": "Notizen",
 

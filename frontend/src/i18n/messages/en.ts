@@ -12,6 +12,8 @@ export const en: Record<keyof typeof de, string> = {
   "action.create": "Create",
   "action.loading": "Loading …",
   "action.saved": "Saved.",
+  "common.yes": "Yes",
+  "common.no": "No",
   "action.saveFailed": "Saving failed: {msg}",
   "action.deleteFailed": "Deleting failed: {msg}",
 
@@ -46,6 +48,7 @@ export const en: Record<keyof typeof de, string> = {
   "field.citesNumber": "CITES / EU certificate number",
   "field.transponderNumber": "Transponder number",
   "field.origin": "Origin",
+  "field.ownBreeding": "Own breeding",
   "field.marks": "Other markings",
   "field.notes": "Notes",
 

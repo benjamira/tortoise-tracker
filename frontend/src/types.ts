@@ -7,6 +7,7 @@ export interface Tortoise {
   schlupfdatum: string | null;
   geschlecht: Geschlecht;
   herkunft: string | null;
+  eigene_nachzucht: boolean;
   cites_nummer: string | null;
   transponder_nr: string | null;
   kennzeichnung: string | null;

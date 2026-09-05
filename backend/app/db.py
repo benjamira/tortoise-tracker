@@ -34,6 +34,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "verkaufsdatum": "DATE",
         "archiviert": "BOOLEAN NOT NULL DEFAULT 0",
         "sortierung": "INTEGER NOT NULL DEFAULT 0",
+        "eigene_nachzucht": "BOOLEAN NOT NULL DEFAULT 0",
     },
 }
 

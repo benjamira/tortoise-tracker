@@ -11,6 +11,7 @@ class Tortoise(SQLModel, table=True):
     schlupfdatum: Optional[date] = None
     geschlecht: str = "unbekannt"  # maennlich | weiblich | unbekannt
     herkunft: Optional[str] = None
+    eigene_nachzucht: bool = Field(default=False)
     cites_nummer: Optional[str] = None
     transponder_nr: Optional[str] = None
     kennzeichnung: Optional[str] = None

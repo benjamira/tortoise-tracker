@@ -83,6 +83,22 @@ def test_photo_upload_reads_exif_date(client):
     assert client.get(f"/api/tortoises/{tid}").json()["titelbild_url"] is not None
 
 
+def test_eigene_nachzucht_fixes_origin(client):
+    created = client.post(
+        "/api/tortoises",
+        json={"name": "Nachzucht", "eigene_nachzucht": True, "herkunft": "irgendwas"},
+    ).json()
+    assert created["eigene_nachzucht"] is True
+    assert created["herkunft"] == "Moosbach (Deutschland)"
+
+    # setting the flag via PATCH also overwrites the origin
+    other = client.post("/api/tortoises", json={"name": "Zukauf", "herkunft": "Züchter X"}).json()
+    patched = client.patch(
+        f"/api/tortoises/{other['id']}", json={"eigene_nachzucht": True}
+    ).json()
+    assert patched["herkunft"] == "Moosbach (Deutschland)"
+
+
 def test_reorder_tortoises(client):
     ids = [client.post("/api/tortoises", json={"name": n}).json()["id"] for n in ("A", "B", "C")]
     # default order follows creation (sortierung increments)
