@@ -101,6 +101,7 @@ export const de = {
   "fotos.dropSuffix": ". Das Aufnahmedatum wird aus den EXIF-Daten übernommen.",
   "fotos.noPhotos": "Noch keine Fotos in der Dokumentation.",
   "fotos.noDate": "ohne Datum",
+  "fotos.editDate": "Aufnahmedatum korrigieren",
 
   "timeline.addEvent": "Ereignis hinzufügen",
   "timeline.type": "Typ",

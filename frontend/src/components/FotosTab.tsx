@@ -17,6 +17,9 @@ export default function FotosTab({
   const [drag, setDrag] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editDate, setEditDate] = useState("");
+  const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(
     () =>
@@ -30,6 +33,25 @@ export default function FotosTab({
   useEffect(() => {
     load();
   }, [load]);
+
+  const startEdit = (p: Attachment) => {
+    setErr(null);
+    setEditId(p.id);
+    setEditDate(p.aufnahme_datum ? p.aufnahme_datum.slice(0, 10) : "");
+  };
+
+  const saveDate = async (id: number) => {
+    if (!editDate) return;
+    setErr(null);
+    try {
+      await api.updateAttachment(id, { aufnahme_datum: editDate });
+      setEditId(null);
+      await load();
+      onChanged();
+    } catch (ex) {
+      setErr(t("action.saveFailed", { msg: (ex as Error).message }));
+    }
+  };
 
   const upload = async (files: File[]) => {
     const imgs = files.filter((f) => f.type.startsWith("image/"));
@@ -81,6 +103,8 @@ export default function FotosTab({
         )}
       </div>
 
+      {err && <p className="danger" style={{ marginTop: 12 }}>{err}</p>}
+
       {photos.length === 0 ? (
         <p className="muted" style={{ marginTop: 20 }}>
           {t("fotos.noPhotos")}
@@ -96,7 +120,35 @@ export default function FotosTab({
                 onClick={() => setLightbox(i)}
               />
               <div>
-                <strong>{p.aufnahme_datum ? formatDate(p.aufnahme_datum) : t("fotos.noDate")}</strong>
+                {editId === p.id ? (
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      style={{ width: "auto" }}
+                      autoFocus
+                    />
+                    <button type="button" className="primary" onClick={() => saveDate(p.id)}>
+                      {t("action.save")}
+                    </button>
+                    <button type="button" onClick={() => setEditId(null)}>
+                      {t("action.cancel")}
+                    </button>
+                  </div>
+                ) : (
+                  <strong>
+                    {p.aufnahme_datum ? formatDate(p.aufnahme_datum) : t("fotos.noDate")}{" "}
+                    <button
+                      type="button"
+                      className="link"
+                      title={t("fotos.editDate")}
+                      onClick={() => startEdit(p)}
+                    >
+                      {t("action.edit")}
+                    </button>
+                  </strong>
+                )}
                 <div className="muted" style={{ fontSize: "0.82rem" }}>
                   {p.originalname}
                 </div>

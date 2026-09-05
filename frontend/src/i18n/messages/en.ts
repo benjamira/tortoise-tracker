@@ -101,6 +101,7 @@ export const en: Record<keyof typeof de, string> = {
   "fotos.dropSuffix": ". The capture date is taken from the EXIF data.",
   "fotos.noPhotos": "No photos in the log yet.",
   "fotos.noDate": "no date",
+  "fotos.editDate": "Correct the capture date",
 
   "timeline.addEvent": "Add event",
   "timeline.type": "Type",

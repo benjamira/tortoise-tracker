@@ -82,6 +82,18 @@ def test_photo_upload_reads_exif_date(client):
     # first uploaded photo becomes the title image
     assert client.get(f"/api/tortoises/{tid}").json()["titelbild_url"] is not None
 
+    # the capture date can be corrected manually
+    fixed = client.patch(
+        f"/api/attachments/{body['id']}", json={"aufnahme_datum": "2024-03-20"}
+    )
+    assert fixed.status_code == 200
+    assert fixed.json()["aufnahme_datum"].startswith("2024-03-20")
+    assert (
+        client.get(f"/api/tortoises/{tid}/attachments", params={"art": "foto"}).json()[0][
+            "aufnahme_datum"
+        ].startswith("2024-03-20")
+    )
+
 
 def test_eigene_nachzucht_fixes_origin(client):
     created = client.post(
