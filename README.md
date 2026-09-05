@@ -239,6 +239,7 @@ missing a key.
 | -------- | ------- | ------- |
 | `.github/workflows/ci.yml` | push to `main`, pull requests | backend tests (pytest) and frontend build / type check |
 | `.github/workflows/docker.yml` | push to `main`, tags `v*`, manual | builds **multi-arch images** (`linux/amd64`, `linux/arm64`) and publishes them to the GitHub Container Registry |
+| `.github/workflows/notify-telegram.yml` | after the image build completes | sends a Telegram message with the result (needs repo secrets `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; skipped if unset) |
 
 Published images:
 

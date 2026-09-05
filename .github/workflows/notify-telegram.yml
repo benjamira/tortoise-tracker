@@ -1,0 +1,47 @@
+name: Notify Telegram
+
+# Sends a Telegram message when the image build finishes (success or failure).
+# Requires repo secrets TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID – without them the
+# job just logs a note and passes. Add "CI" to the workflows list below to also be
+# notified about the fast test workflow.
+on:
+  workflow_run:
+    workflows: ["Build & publish Docker images"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram message
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WF_NAME: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          TITLE: ${{ github.event.workflow_run.display_title }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$CHAT" ]; then
+            echo "TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set – skipping."
+            exit 0
+          fi
+          case "$CONCLUSION" in
+            success)   ICON="✅" ;;
+            failure)   ICON="❌" ;;
+            cancelled) ICON="🚫" ;;
+            *)         ICON="ℹ️" ;;
+          esac
+          TEXT="${ICON} ${WF_NAME}: ${CONCLUSION}
+          ${TITLE}
+          ${BRANCH} · ${HEAD_SHA:0:7}
+          ${RUN_URL}"
+          curl -sS --fail -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT}" \
+            --data-urlencode "text=${TEXT}" \
+            --data-urlencode "disable_web_page_preview=true"
