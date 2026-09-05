@@ -74,15 +74,28 @@ def photo_interval_months(tortoise: Tortoise, today: date, cfg: dict) -> int:
     return cfg["foto_intervall_alt_monate"]
 
 
+def _foto_reference(session, tortoise: Tortoise) -> date | None:
+    return (
+        _latest_photo_date(session, tortoise.id)
+        or tortoise.schlupfdatum
+        or tortoise.erworben_am
+    )
+
+
+def _foto_due(session, tortoise: Tortoise, today: date, cfg: dict) -> bool:
+    ref = _foto_reference(session, tortoise)
+    if ref is None:
+        return False
+    return _add_months(ref, photo_interval_months(tortoise, today, cfg)) <= today
+
+
 def _check_foto(session, tortoise: Tortoise, today: date, cfg: dict) -> Reminder | None:
     if _open_reminder(session, tortoise.id, "fotodokumentation"):
         return None
-    ref = _latest_photo_date(session, tortoise.id) or tortoise.schlupfdatum or tortoise.erworben_am
-    if ref is None:
+    ref = _foto_reference(session, tortoise)
+    if ref is None or _add_months(ref, photo_interval_months(tortoise, today, cfg)) > today:
         return None
     interval = photo_interval_months(tortoise, today, cfg)
-    if _add_months(ref, interval) > today:
-        return None
     reminder = Reminder(
         tortoise_id=tortoise.id,
         typ="fotodokumentation",
@@ -92,6 +105,15 @@ def _check_foto(session, tortoise: Tortoise, today: date, cfg: dict) -> Reminder
     session.add(reminder)
     session.flush()
     return reminder
+
+
+def _auto_resolve_foto(session, tortoise: Tortoise, today: date, cfg: dict) -> None:
+    """Close an open photo reminder once a fresh photo makes it no longer due."""
+    reminder = _open_reminder(session, tortoise.id, "fotodokumentation")
+    if reminder and not _foto_due(session, tortoise, today, cfg):
+        reminder.status = "erledigt"
+        reminder.erledigt_am = datetime.utcnow()
+        session.add(reminder)
 
 
 def _check_chip(session, tortoise: Tortoise, today: date, cfg: dict) -> Reminder | None:
@@ -144,6 +166,7 @@ def evaluate(session: Session, today: date | None = None) -> list[Reminder]:
             _resolve_all_open(session, tortoise.id)
             continue
         _auto_resolve_chip(session, tortoise)
+        _auto_resolve_foto(session, tortoise, today, cfg)
         if cfg["reminder_fotodoku_aktiv"]:
             r = _check_foto(session, tortoise, today, cfg)
             if r:

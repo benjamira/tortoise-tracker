@@ -1,8 +1,8 @@
-from datetime import date
+from datetime import date, datetime
 
 from app import reminders
 from app.db import make_session
-from app.models import Measurement, Tortoise
+from app.models import Attachment, Measurement, Tortoise
 
 
 def _add_tortoise(**kwargs) -> int:
@@ -30,6 +30,32 @@ def test_foto_reminder_for_young_tortoise(client):
     # structured context for the frontend to localize
     assert listed[0]["context"]["intervall_monate"] == 6
     assert "letzte_doku" in listed[0]["context"]
+
+
+def test_foto_reminder_clears_when_photo_added(client):
+    tid = _add_tortoise(name="Alt", schlupfdatum=date(2011, 8, 4))
+    with make_session() as session:
+        created = reminders.evaluate(session, today=date(2026, 9, 5))
+    assert any(r.typ == "fotodokumentation" for r in created)
+
+    # a recent photo makes the reminder no longer due -> it is auto-resolved
+    with make_session() as session:
+        session.add(
+            Attachment(
+                tortoise_id=tid,
+                art="foto",
+                dateiname="x.jpg",
+                originalname="x.jpg",
+                mime="image/jpeg",
+                groesse_bytes=1,
+                aufnahme_datum=datetime(2026, 8, 31, 12, 0),
+            )
+        )
+        session.commit()
+        reminders.evaluate(session, today=date(2026, 9, 5))
+
+    open_types = [r["typ"] for r in client.get("/api/reminders").json() if r["tier_name"] == "Alt"]
+    assert "fotodokumentation" not in open_types
 
 
 def test_chip_reminder_on_weight_threshold(client):
