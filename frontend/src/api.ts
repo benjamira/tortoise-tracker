@@ -77,9 +77,9 @@ export const api = {
       body: form,
     });
   },
-  setTitelbild: (tid: number, file: File) => {
+  setTitelbild: (tid: number, image: Blob) => {
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", image, "profil.jpg");
     return req<Attachment>(`/api/tortoises/${tid}/titelbild`, {
       method: "PUT",
       body: form,

@@ -75,6 +75,8 @@ export const de = {
   "stammdaten.profilePicture": "Profilbild",
   "stammdaten.uploadImage": "Bild hochladen",
   "stammdaten.changeImage": "Bild ändern",
+  "profilePicture.editTitle": "Profilbild zuschneiden",
+  "profilePicture.zoom": "Zoom",
   "stammdaten.masterData": "Stammdaten",
   "stammdaten.documents": "Dokumente",
   "stammdaten.documentsHint": "CITES-Bescheinigung, Herkunftsnachweis, Tierarztberichte … (PDF/Bild)",

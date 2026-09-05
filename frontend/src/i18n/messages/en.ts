@@ -75,6 +75,8 @@ export const en: Record<keyof typeof de, string> = {
   "stammdaten.profilePicture": "Profile picture",
   "stammdaten.uploadImage": "Upload image",
   "stammdaten.changeImage": "Change image",
+  "profilePicture.editTitle": "Crop profile picture",
+  "profilePicture.zoom": "Zoom",
   "stammdaten.masterData": "Master data",
   "stammdaten.documents": "Documents",
   "stammdaten.documentsHint": "CITES certificate, proof of origin, vet reports … (PDF/image)",

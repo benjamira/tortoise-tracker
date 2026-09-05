@@ -5,6 +5,7 @@ import { useT } from "../i18n";
 import type { Attachment, Tortoise } from "../types";
 import Modal from "./Modal";
 import TortoiseForm from "./TortoiseForm";
+import ProfilePictureEditor from "./ProfilePictureEditor";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -26,6 +27,7 @@ export default function StammdatenTab({
   const [editing, setEditing] = useState(false);
   const [docs, setDocs] = useState<Attachment[]>([]);
   const [pbBusy, setPbBusy] = useState(false);
+  const [pbFile, setPbFile] = useState<File | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const pbInput = useRef<HTMLInputElement>(null);
 
@@ -60,17 +62,10 @@ export default function StammdatenTab({
               type="file"
               accept="image/*"
               hidden
-              onChange={async (e) => {
+              onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (!f) return;
-                setPbBusy(true);
-                try {
-                  await api.setTitelbild(tortoise.id, f);
-                  if (pbInput.current) pbInput.current.value = "";
-                  onChanged();
-                } finally {
-                  setPbBusy(false);
-                }
+                if (pbInput.current) pbInput.current.value = "";
+                if (f) setPbFile(f);
               }}
             />
             <button onClick={() => pbInput.current?.click()} disabled={pbBusy}>
@@ -188,6 +183,23 @@ export default function StammdatenTab({
           {t("stammdaten.deleteTortoise")}
         </button>
       </div>
+
+      {pbFile && (
+        <ProfilePictureEditor
+          file={pbFile}
+          onCancel={() => setPbFile(null)}
+          onSave={async (blob) => {
+            setPbBusy(true);
+            try {
+              await api.setTitelbild(tortoise.id, blob);
+              setPbFile(null);
+              onChanged();
+            } finally {
+              setPbBusy(false);
+            }
+          }}
+        />
+      )}
 
       {editing && (
         <Modal title={t("modal.editTortoise", { name: tortoise.name })} onClose={() => setEditing(false)}>
