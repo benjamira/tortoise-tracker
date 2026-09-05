@@ -14,6 +14,7 @@ export const en: Record<keyof typeof de, string> = {
   "action.saved": "Saved.",
   "common.yes": "Yes",
   "common.no": "No",
+  "common.date": "Date",
   "action.saveFailed": "Saving failed: {msg}",
   "action.deleteFailed": "Deleting failed: {msg}",
 
@@ -25,6 +26,7 @@ export const en: Record<keyof typeof de, string> = {
   "sidebar.addTortoise": "Add tortoise",
   "sidebar.settings": "Settings",
   "sidebar.archive": "Archive",
+  "sidebar.notes": "Notes",
   "sidebar.dragToSort": "Drag to reorder",
   "sidebar.noWeight": "no weight",
   "sidebar.archived": "archived",
@@ -116,6 +118,12 @@ export const en: Record<keyof typeof de, string> = {
   "eventType.tierarzt": "Vet visit",
   "eventType.medikation": "Medication",
   "eventType.sonstiges": "Other",
+
+  "notes.title": "Notes",
+  "notes.add": "Add note",
+  "notes.text": "Note (free text)",
+  "notes.placeholder": "e.g. diet change, observations, appointments …",
+  "notes.none": "No notes yet.",
 
   "settings.title": "Settings",
   "settings.telegramTitle": "Telegram notification",

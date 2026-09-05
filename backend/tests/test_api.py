@@ -111,6 +111,28 @@ def test_eigene_nachzucht_fixes_origin(client):
     assert patched["herkunft"] == "Moosbach (Deutschland)"
 
 
+def test_notes_crud(client):
+    assert client.get("/api/notes").json() == []
+
+    a = client.post("/api/notes", json={"datum": "2026-01-10", "text": "erste"}).json()
+    b = client.post("/api/notes", json={"datum": "2026-03-01", "text": "zweite"}).json()
+    assert b["datum"] == "2026-03-01"
+
+    # newest date first
+    listed = client.get("/api/notes").json()
+    assert [n["id"] for n in listed] == [b["id"], a["id"]]
+
+    upd = client.patch(f"/api/notes/{a['id']}", json={"text": "geändert"})
+    assert upd.json()["text"] == "geändert"
+
+    assert client.delete(f"/api/notes/{b['id']}").status_code == 204
+    assert len(client.get("/api/notes").json()) == 1
+
+    # date defaults to today when omitted
+    c = client.post("/api/notes", json={"text": "ohne datum"}).json()
+    assert c["datum"]
+
+
 def test_reorder_tortoises(client):
     ids = [client.post("/api/tortoises", json={"name": n}).json()["id"] for n in ("A", "B", "C")]
     # default order follows creation (sortierung increments)

@@ -14,6 +14,7 @@ export const de = {
   "action.saved": "Gespeichert.",
   "common.yes": "Ja",
   "common.no": "Nein",
+  "common.date": "Datum",
   "action.saveFailed": "Speichern fehlgeschlagen: {msg}",
   "action.deleteFailed": "Löschen fehlgeschlagen: {msg}",
 
@@ -25,6 +26,7 @@ export const de = {
   "sidebar.addTortoise": "Schildkröte hinzufügen",
   "sidebar.settings": "Einstellungen",
   "sidebar.archive": "Archiv",
+  "sidebar.notes": "Notizen",
   "sidebar.dragToSort": "Zum Sortieren ziehen",
   "sidebar.noWeight": "kein Gewicht",
   "sidebar.archived": "archiviert",
@@ -116,6 +118,12 @@ export const de = {
   "eventType.tierarzt": "Tierarztbesuch",
   "eventType.medikation": "Medikation",
   "eventType.sonstiges": "Sonstiges",
+
+  "notes.title": "Notizen",
+  "notes.add": "Notiz hinzufügen",
+  "notes.text": "Notiz (Freitext)",
+  "notes.placeholder": "z.B. Futterumstellung, Beobachtungen, Termine …",
+  "notes.none": "Noch keine Notizen.",
 
   "settings.title": "Einstellungen",
   "settings.telegramTitle": "Telegram-Benachrichtigung",

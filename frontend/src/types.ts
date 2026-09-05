@@ -84,6 +84,13 @@ export interface Reminder {
   context: ReminderContext;
 }
 
+export interface Note {
+  id: number;
+  datum: string;
+  text: string;
+  created_at: string;
+}
+
 export interface Settings {
   telegram_bot_token: string;
   telegram_chat_id: string;

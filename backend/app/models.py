@@ -57,6 +57,15 @@ class Attachment(SQLModel, table=True):
     hochgeladen_am: datetime = Field(default_factory=datetime.utcnow)
 
 
+class Note(SQLModel, table=True):
+    """Standalone free-text note (not tied to a tortoise)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    datum: date = Field(default_factory=lambda: datetime.utcnow().date())
+    text: str = ""
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class Setting(SQLModel, table=True):
     key: str = Field(primary_key=True)
     value: str  # JSON-encoded

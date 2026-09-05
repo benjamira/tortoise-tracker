@@ -144,6 +144,15 @@ export default function Sidebar({
 
       <div className="spacer" />
       <NavLink
+        to="/notizen"
+        className={({ isActive }) => `tier-item${isActive ? " active" : ""}`}
+      >
+        <span className="avatar">📝</span>
+        <span className="meta">
+          <span className="nm">{t("sidebar.notes")}</span>
+        </span>
+      </NavLink>
+      <NavLink
         to="/einstellungen"
         className={({ isActive }) => `tier-item${isActive ? " active" : ""}`}
       >

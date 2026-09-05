@@ -1,6 +1,7 @@
 import type {
   Attachment,
   Measurement,
+  Note,
   Reminder,
   Settings,
   Tortoise,
@@ -92,6 +93,13 @@ export const api = {
     req<Attachment>(`/api/attachments/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteAttachment: (id: number) =>
     req<void>(`/api/attachments/${id}`, { method: "DELETE" }),
+
+  listNotes: () => req<Note[]>("/api/notes"),
+  createNote: (data: { datum?: string; text: string }) =>
+    req<Note>("/api/notes", { method: "POST", body: JSON.stringify(data) }),
+  updateNote: (id: number, data: Partial<Pick<Note, "datum" | "text">>) =>
+    req<Note>(`/api/notes/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  deleteNote: (id: number) => req<void>(`/api/notes/${id}`, { method: "DELETE" }),
 
   listReminders: () => req<Reminder[]>("/api/reminders"),
   evaluateReminders: () =>

@@ -10,6 +10,7 @@ from .routers import (
     attachments,
     events,
     measurements,
+    notes,
     reminders,
     settings,
     tortoises,
@@ -48,5 +49,6 @@ app.include_router(events.router)
 app.include_router(attachments.router)
 app.include_router(settings.router)
 app.include_router(reminders.router)
+app.include_router(notes.router)
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
