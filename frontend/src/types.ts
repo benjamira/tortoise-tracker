@@ -79,6 +79,8 @@ export interface Reminder {
   typ: "fotodokumentation" | "chip";
   faellig_seit: string;
   status: string;
+  snooze_bis: string | null;
+  snoozed: boolean;
   tier_name: string | null;
   text: string;
   context: ReminderContext;

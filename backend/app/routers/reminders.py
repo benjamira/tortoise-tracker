@@ -29,23 +29,26 @@ def _context(session: Session, r: Reminder, tortoise: Tortoise | None, cfg: dict
 
 @router.get("")
 def list_reminders(session: Session = Depends(get_session)):
+    """All non-resolved reminders. Snoozed ones (snooze_bis in the future) are
+    included too – the frontend shows them greyed out – so nothing silently
+    disappears."""
     today = date.today()
     cfg = settings_store.get_all(session)
     rows = session.exec(select(Reminder).where(Reminder.status != "erledigt")).all()
     out = []
     for r in rows:
-        if r.status == "snooze" and r.snooze_bis and r.snooze_bis > today:
-            continue
+        snoozed = bool(r.status == "snooze" and r.snooze_bis and r.snooze_bis > today)
         tortoise = session.get(Tortoise, r.tortoise_id)
         out.append(
             {
                 **r.model_dump(),
+                "snoozed": snoozed,
                 "tier_name": tortoise.name if tortoise else None,
                 "text": reminders_mod.message_for(session, r),  # German, fallback
                 "context": _context(session, r, tortoise, cfg, today),
             }
         )
-    out.sort(key=lambda x: x["faellig_seit"])
+    out.sort(key=lambda x: (x["snoozed"], x["faellig_seit"]))
     return out
 
 
@@ -82,3 +85,15 @@ def snooze(rid: int, payload: dict | None = None, session: Session = Depends(get
     session.add(r)
     session.commit()
     return {"status": "snooze", "snooze_bis": r.snooze_bis.isoformat()}
+
+
+@router.post("/{rid}/unsnooze")
+def unsnooze(rid: int, session: Session = Depends(get_session)):
+    r = session.get(Reminder, rid)
+    if not r:
+        raise HTTPException(404, "Erinnerung nicht gefunden")
+    r.status = "offen"
+    r.snooze_bis = None
+    session.add(r)
+    session.commit()
+    return {"status": "offen"}

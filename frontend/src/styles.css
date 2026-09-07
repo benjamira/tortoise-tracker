@@ -295,6 +295,17 @@ th { color: var(--muted); font-weight: 600; }
 .reminder-item { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; font-size: 0.88rem; }
 .reminder-item:first-of-type { border-top: none; }
 .reminder-item .actions { display: flex; gap: 6px; margin-top: 6px; }
+.reminder-item.snoozed { opacity: 0.7; }
+.reminder-subhead + .reminder-item { border-top: none; padding-top: 0; }
+.reminder-subhead {
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
 
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.4);

@@ -86,14 +86,22 @@ def test_no_chip_reminder_below_threshold(client):
     assert all(r.typ != "chip" for r in created)
 
 
-def test_ack_and_snooze(client):
+def test_ack_snooze_unsnooze(client):
     _add_tortoise(name="Ack", schlupfdatum=date(2024, 1, 1))
     with make_session() as session:
         created = reminders.evaluate(session, today=date(2026, 1, 1))
     rid = created[0].id
 
+    # snoozed reminders stay in the list, flagged (shown greyed in the UI)
     client.post(f"/api/reminders/{rid}/snooze", json={"tage": 30})
-    assert client.get("/api/reminders").json() == []
+    listed = client.get("/api/reminders").json()
+    assert len(listed) == 1 and listed[0]["snoozed"] is True
 
+    # un-snooze brings it back as active
+    client.post(f"/api/reminders/{rid}/unsnooze")
+    listed = client.get("/api/reminders").json()
+    assert len(listed) == 1 and listed[0]["snoozed"] is False
+
+    # ack removes it for good
     client.post(f"/api/reminders/{rid}/ack")
     assert client.get("/api/reminders").json() == []

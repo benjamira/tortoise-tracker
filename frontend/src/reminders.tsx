@@ -29,11 +29,11 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
       await api.evaluateReminders();
       const list = await api.listReminders();
       setReminders(list);
-      const hasNew = list.some((r) => !seen.current.has(r.id));
+      const hasNewActive = list.some((r) => !r.snoozed && !seen.current.has(r.id));
       seen.current = new Set(list.map((r) => r.id));
-      // Auto-open the panel when a not-yet-seen reminder shows up. Otherwise
-      // leave it to the user (the bell stays visible either way).
-      if (hasNew) setPanelOpen(true);
+      // Auto-open the panel when a not-yet-seen active reminder shows up.
+      // Otherwise leave it to the user (the bell stays visible either way).
+      if (hasNewActive) setPanelOpen(true);
     } catch {
       /* offline / backend not ready */
     }

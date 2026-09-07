@@ -111,6 +111,8 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ tage }),
     }),
+  unsnoozeReminder: (id: number) =>
+    req<unknown>(`/api/reminders/${id}/unsnooze`, { method: "POST" }),
 
   getVersion: () => req<{ version: string }>("/api/version"),
 

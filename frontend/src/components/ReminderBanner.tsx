@@ -36,17 +36,21 @@ export default function ReminderBanner() {
 
   if (!panelOpen) return null;
 
+  const active = reminders.filter((r) => !r.snoozed);
+  const snoozed = reminders.filter((r) => r.snoozed);
+
   return (
     <div className="reminder-banner">
       <h3>
-        {reminders.length > 0
-          ? t("reminder.openTitle", { count: reminders.length })
+        {active.length > 0
+          ? t("reminder.openTitle", { count: active.length })
           : t("reminder.none")}{" "}
         <button className="link" onClick={() => setPanelOpen(false)}>
           {t("reminder.hide")}
         </button>
       </h3>
-      {reminders.map((r) => {
+
+      {active.map((r) => {
         const { title, detail } = reminderText(r);
         return (
           <div key={r.id} className="reminder-item">
@@ -80,6 +84,38 @@ export default function ReminderBanner() {
           </div>
         );
       })}
+
+      {snoozed.length > 0 && (
+        <>
+          <div className="reminder-subhead">{t("reminder.snoozedSection")}</div>
+          {snoozed.map((r) => {
+            const { title } = reminderText(r);
+            return (
+              <div key={r.id} className="reminder-item snoozed">
+                <span className="muted">
+                  <strong>{r.tier_name}</strong> — {title}
+                </span>
+                <div className="muted" style={{ fontSize: "0.82rem" }}>
+                  {r.snooze_bis
+                    ? t("reminder.snoozedUntil", { date: formatDate(r.snooze_bis) })
+                    : ""}
+                </div>
+                <div className="actions">
+                  <button
+                    className="link"
+                    onClick={async () => {
+                      await api.unsnoozeReminder(r.id);
+                      refresh();
+                    }}
+                  >
+                    {t("reminder.unsnooze")}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
