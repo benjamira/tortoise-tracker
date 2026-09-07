@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { formatDate, formatWeight } from "../format";
 import { useT } from "../i18n";
-import type { Reminder, Tortoise } from "../types";
+import { useReminders } from "../reminders";
+import type { Reminder } from "../types";
 
 function useReminderText() {
   const t = useT();
@@ -19,45 +19,28 @@ function useReminderText() {
     return {
       title: t("reminder.chipDue"),
       detail: t("reminder.chipContext", {
-        weight: r.context.gewicht_g != null ? formatWeight(r.context.gewicht_g).replace(" g", "") : "?",
+        weight:
+          r.context.gewicht_g != null
+            ? formatWeight(r.context.gewicht_g).replace(" g", "")
+            : "?",
         threshold: r.context.schwelle_g ?? "?",
       }),
     };
   };
 }
 
-export default function ReminderBanner({ tortoises }: { tortoises: Tortoise[] }) {
+export default function ReminderBanner() {
   const t = useT();
   const reminderText = useReminderText();
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [dismissed, setDismissed] = useState(false);
+  const { reminders, refresh, panelOpen, setPanelOpen } = useReminders();
 
-  const refresh = useCallback(async () => {
-    try {
-      await api.evaluateReminders();
-      setReminders(await api.listReminders());
-    } catch {
-      /* offline / not ready */
-    }
-  }, []);
-
-  useEffect(() => {
-    refresh();
-    const timer = setInterval(refresh, 10 * 60 * 1000);
-    return () => clearInterval(timer);
-  }, [refresh]);
-
-  useEffect(() => {
-    if (tortoises.length) refresh();
-  }, [tortoises.length, refresh]);
-
-  if (dismissed || reminders.length === 0) return null;
+  if (!panelOpen || reminders.length === 0) return null;
 
   return (
     <div className="reminder-banner">
       <h3>
         {t("reminder.openTitle", { count: reminders.length })}{" "}
-        <button className="link" onClick={() => setDismissed(true)}>
+        <button className="link" onClick={() => setPanelOpen(false)}>
           {t("reminder.hide")}
         </button>
       </h3>

@@ -7,6 +7,7 @@ import Settings from "./pages/Settings";
 import Notes from "./pages/Notes";
 import { ThemeProvider } from "./theme";
 import { I18nProvider } from "./i18n";
+import { RemindersProvider } from "./reminders";
 import "./styles.css";
 
 const router = createBrowserRouter([
@@ -27,7 +28,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <I18nProvider>
       <ThemeProvider>
-        <RouterProvider router={router} />
+        <RemindersProvider>
+          <RouterProvider router={router} />
+        </RemindersProvider>
       </ThemeProvider>
     </I18nProvider>
   </React.StrictMode>,
