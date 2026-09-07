@@ -1,8 +1,9 @@
 name: Build & publish Docker images
 
+# Runs on version tags (created by release.yml on every merge to main), on PRs
+# (build only, no push) and manually.
 on:
   push:
-    branches: [main]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
@@ -43,13 +44,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.component }}
+          # `latest` is added automatically for stable semver tags (flavor latest=auto).
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,format=short
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short
+            type=ref,event=pr
 
       - name: Build and push
         uses: docker/build-push-action@v6

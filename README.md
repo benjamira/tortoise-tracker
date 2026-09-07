@@ -254,7 +254,8 @@ missing a key.
 | Workflow | Trigger | Purpose |
 | -------- | ------- | ------- |
 | `.github/workflows/ci.yml` | push to `main`, pull requests | backend tests (pytest) and frontend build / type check |
-| `.github/workflows/docker.yml` | push to `main`, tags `v*`, manual | builds **multi-arch images** (`linux/amd64`, `linux/arm64`) and publishes them to the GitHub Container Registry |
+| `.github/workflows/release.yml` | push to `main` | bumps the version from the commit messages (Conventional Commits, default patch), creates the `vX.Y.Z` tag and triggers the image build for it |
+| `.github/workflows/docker.yml` | tag `v*`, pull requests, manual | builds **multi-arch images** (`linux/amd64`, `linux/arm64`) and publishes them to the GitHub Container Registry |
 | `.github/workflows/notify-telegram.yml` | after the image build completes | sends a Telegram message with the result (needs repo secrets `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; skipped if unset) |
 
 Published images:
@@ -262,8 +263,9 @@ Published images:
 - `ghcr.io/benjamira/tortoise-tracker-backend`
 - `ghcr.io/benjamira/tortoise-tracker-frontend`
 
-Tags: `latest` (latest `main`), `sha-<short>` per commit, plus `X.Y.Z` / `X.Y`
-for a release tag `vX.Y.Z`.
+Every merge to `main` produces a new release: image tags `X.Y.Z`, `X.Y`, `latest`
+and `sha-<short>`. Pin a concrete `X.Y.Z` (or the digest) for deployments; PRs
+build the images but do not push them.
 
 ---
 

@@ -1,0 +1,35 @@
+name: Release
+
+# On every merge to main: bump the version and create a `vX.Y.Z` tag, then kick
+# off the image build for that tag. Bump level from the commit messages
+# (Conventional Commits): fix: -> patch, feat: -> minor, BREAKING CHANGE -> major;
+# default is patch. Nothing to publish -> no tag, no build.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: bump
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+
+      - name: Build & publish images for the new tag
+        if: steps.bump.outputs.new_tag != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run docker.yml --ref "${{ steps.bump.outputs.new_tag }}"
