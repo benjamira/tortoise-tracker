@@ -1,7 +1,7 @@
 # Runs the published images from GHCR. Update with:
 #   docker compose pull && docker compose up -d
 services:
-  api:
+  tortoise-tracker-api:
     image: ghcr.io/benjamira/tortoise-tracker-backend:latest
     container_name: tortoise-tracker-api
     environment:
@@ -10,11 +10,11 @@ services:
       - ./data:/data
     restart: unless-stopped
 
-  web:
+  tortoise-tracker-web:
     image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
     container_name: tortoise-tracker-web
     depends_on:
-      - api
+      - tortoise-tracker-api
     ports:
       - "8080:80"
     restart: unless-stopped

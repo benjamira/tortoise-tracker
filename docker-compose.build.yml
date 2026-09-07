@@ -1,7 +1,7 @@
 # Optional override to build the images locally from source instead of pulling:
 #   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 services:
-  api:
+  tortoise-tracker-api:
     build: ./backend
-  web:
+  tortoise-tracker-web:
     build: ./frontend

@@ -59,20 +59,20 @@ Two containers:
 
 | Service | Stack | Role |
 | ------- | ----- | ---- |
-| `api`   | FastAPI · SQLModel · SQLite · Pillow (+ pillow-heif) · APScheduler | REST API under `/api`, file uploads under `/uploads`, reminder evaluation (daily at 08:00, on startup and on every page load) |
-| `web`   | React · Vite · TypeScript · Recharts · nginx | Static frontend; nginx serves the app and proxies `/api` and `/uploads` to the `api` container |
+| `tortoise-tracker-api` | FastAPI · SQLModel · SQLite · Pillow (+ pillow-heif) · APScheduler | REST API under `/api`, file uploads under `/uploads`, reminder evaluation (daily at 08:00, on startup and on every page load) |
+| `tortoise-tracker-web` | React · Vite · TypeScript · Recharts · nginx | Static frontend; nginx serves the app and proxies `/api` and `/uploads` to the api container |
 
 ```
-Browser ──▶ web (nginx :80) ──┬─ static app
-                              ├─ /api/…     ─▶ api (uvicorn :8000)
-                              └─ /uploads/… ─▶ api
-                                                 │
-                                       ./data ───┤  schildkroeten.db
-                                                 └  uploads/  (+ thumbs/)
+Browser ──▶ tortoise-tracker-web (nginx :80) ──┬─ static app
+                                               ├─ /api/…     ─▶ tortoise-tracker-api (uvicorn :8000)
+                                               └─ /uploads/… ─▶ tortoise-tracker-api
+                                                                    │
+                                                          ./data ───┤  schildkroeten.db
+                                                                    └  uploads/  (+ thumbs/)
 ```
 
 All persistent state lives in the **`./data`** directory (SQLite file + uploaded
-photos/documents), mounted as a volume into the `api` container.
+photos/documents), mounted as a volume into the api container.
 
 ### Repository layout
 
@@ -103,7 +103,7 @@ For reference, this is the `docker-compose.yml` it downloads:
 # Runs the published images from GHCR. Update with:
 #   docker compose pull && docker compose up -d
 services:
-  api:
+  tortoise-tracker-api:
     image: ghcr.io/benjamira/tortoise-tracker-backend:latest
     container_name: tortoise-tracker-api
     environment:
@@ -112,11 +112,11 @@ services:
       - ./data:/data
     restart: unless-stopped
 
-  web:
+  tortoise-tracker-web:
     image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
     container_name: tortoise-tracker-web
     depends_on:
-      - api
+      - tortoise-tracker-api
     ports:
       - "8080:80"
     restart: unless-stopped
@@ -145,7 +145,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 docker network create tortoise-tracker
 
 docker run -d --name tortoise-tracker-api \
-  --network tortoise-tracker --network-alias api \
+  --network tortoise-tracker \
   -v "$PWD/data:/data" \
   --restart unless-stopped \
   ghcr.io/benjamira/tortoise-tracker-backend:latest
@@ -157,8 +157,8 @@ docker run -d --name tortoise-tracker-web \
   ghcr.io/benjamira/tortoise-tracker-frontend:latest
 ```
 
-Important: the backend container must be reachable as **`api`** on the network
-(`--network-alias api`), because that is where nginx proxies to.
+Important: the backend container must be named **`tortoise-tracker-api`** and be on
+the same user-defined network, because that is the host nginx proxies to.
 
 ---
 
@@ -167,7 +167,7 @@ Important: the backend container must be reachable as **`api`** on the network
 | Setting | Where | Default |
 | ------- | ----- | ------- |
 | Frontend host port | `ports:` in `docker-compose.yml` / `-p` | `8080:80` |
-| Data directory in the container | env `DATA_DIR` on the `api` container | `/data` |
+| Data directory in the container | env `DATA_DIR` on `tortoise-tracker-api` | `/data` |
 | Telegram bot token & chat/channel ID | UI → **Settings** | – |
 | Photo intervals, age limit, chip weight threshold | UI → **Settings** | 6 / 12 months, 5 years, 500 g |
 | Enable/disable each reminder type | UI → **Settings** | on |
