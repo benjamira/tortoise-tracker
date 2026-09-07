@@ -1,0 +1,45 @@
+# Use this instead of docker-compose.yml when an external Traefik instance already
+# handles TLS and routing. Traefik reaches the frontend on its internal port 80,
+# so no host port is published here.
+#
+#   docker compose -f docker-compose.traefik.yml up -d
+#
+# Adjust the placeholders to your Traefik setup: the external network name, the
+# entrypoint (`websecure`), the ACME cert resolver (`le`) and the Host() rule.
+services:
+  tortoise-tracker-api:
+    image: ghcr.io/benjamira/tortoise-tracker-backend:latest
+    container_name: tortoise-tracker-api
+    environment:
+      - DATA_DIR=/data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    networks:
+      - internal
+
+  tortoise-tracker-web:
+    image: ghcr.io/benjamira/tortoise-tracker-frontend:latest
+    container_name: tortoise-tracker-web
+    depends_on:
+      - tortoise-tracker-api
+    restart: unless-stopped
+    networks:
+      - internal   # to reach tortoise-tracker-api:8000
+      - traefik    # so Traefik can reach this container
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.tortoise.rule=Host(`schildkroeten.example.com`)
+      - traefik.http.routers.tortoise.entrypoints=websecure
+      - traefik.http.routers.tortoise.tls.certresolver=le
+      - traefik.http.services.tortoise.loadbalancer.server.port=80
+      # The app has NO authentication – protect it with a Traefik basic-auth
+      # middleware (generate with `htpasswd -nbB user 'pass'`, double every $ -> $$):
+      # - traefik.http.routers.tortoise.middlewares=tortoise-auth
+      # - traefik.http.middlewares.tortoise-auth.basicauth.users=USER:HASH
+
+networks:
+  internal:
+  traefik:
+    external: true

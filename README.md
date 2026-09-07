@@ -160,6 +160,22 @@ docker run -d --name tortoise-tracker-web \
 Important: the backend container must be named **`tortoise-tracker-api`** and be on
 the same user-defined network, because that is the host nginx proxies to.
 
+### Behind Traefik
+
+If an external Traefik already terminates TLS and routes traffic, use
+[`docker-compose.traefik.yml`](docker-compose.traefik.yml) instead – it drops the
+published port and adds Traefik labels to the frontend:
+
+```bash
+curl -O https://raw.githubusercontent.com/benjamira/tortoise-tracker/main/docker-compose.traefik.yml
+docker compose -f docker-compose.traefik.yml up -d
+```
+
+Adjust the placeholders (external network name, `websecure` entrypoint, `le` cert
+resolver, `Host(...)` rule). Since the app has no authentication, the file also
+contains a commented Traefik `basicAuth` middleware – enable it for any
+internet-facing deployment.
+
 ---
 
 ## Configuration
