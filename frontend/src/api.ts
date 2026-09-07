@@ -112,6 +112,8 @@ export const api = {
       body: JSON.stringify({ tage }),
     }),
 
+  getVersion: () => req<{ version: string }>("/api/version"),
+
   getSettings: () => req<Settings>("/api/settings"),
   saveSettings: (data: Partial<Settings>) =>
     req<Settings>("/api/settings", { method: "PUT", body: JSON.stringify(data) }),

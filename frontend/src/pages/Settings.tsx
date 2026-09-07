@@ -3,13 +3,20 @@ import { api } from "../api";
 import { useT } from "../i18n";
 import type { Settings } from "../types";
 
+const FRONTEND_VERSION = String(import.meta.env.VITE_APP_VERSION ?? "dev");
+
 export default function SettingsPage() {
   const t = useT();
   const [s, setS] = useState<Settings | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [backendVersion, setBackendVersion] = useState("…");
 
   useEffect(() => {
     api.getSettings().then(setS);
+    api
+      .getVersion()
+      .then((v) => setBackendVersion(v.version))
+      .catch(() => setBackendVersion("?"));
   }, []);
 
   if (!s) return <p className="muted">{t("action.loading")}</p>;
@@ -110,6 +117,10 @@ export default function SettingsPage() {
         {t("action.save")}
       </button>
       {msg && <span style={{ marginLeft: 10 }}>{msg}</span>}
+
+      <p className="muted" style={{ marginTop: 28, fontSize: "0.8rem" }}>
+        {t("settings.versions")}: Frontend {FRONTEND_VERSION} · Backend {backendVersion}
+      </p>
     </div>
   );
 }

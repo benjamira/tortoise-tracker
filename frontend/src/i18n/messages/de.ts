@@ -125,6 +125,8 @@ export const de = {
   "notes.placeholder": "z.B. Futterumstellung, Beobachtungen, Termine …",
   "notes.none": "Noch keine Notizen.",
 
+  "settings.versions": "Versionen",
+
   "settings.title": "Einstellungen",
   "settings.telegramTitle": "Telegram-Benachrichtigung",
   "settings.telegramHint":
@@ -144,6 +146,7 @@ export const de = {
     "Telegram-Nachrichten werden unabhängig von dieser Auswahl auf Deutsch versendet.",
 
   "reminder.openTitle": "Offene Erinnerungen ({count})",
+  "reminder.none": "Keine offenen Erinnerungen",
   "reminder.hide": "ausblenden",
   "reminder.done": "Erledigt",
   "reminder.snoozeDays": "{days} Tage",

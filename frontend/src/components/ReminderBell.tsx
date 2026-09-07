@@ -4,20 +4,19 @@ import { useReminders } from "../reminders";
 export default function ReminderBell() {
   const t = useT();
   const { reminders, panelOpen, setPanelOpen } = useReminders();
+  const count = reminders.length;
+  const label = count > 0 ? t("reminder.openTitle", { count }) : t("reminder.none");
 
-  if (reminders.length === 0) return null;
-
-  const label = t("reminder.openTitle", { count: reminders.length });
   return (
     <button
       type="button"
-      className={`reminder-bell${panelOpen ? " active" : ""}`}
+      className={`reminder-bell${count > 0 ? " has-reminders" : ""}${panelOpen ? " active" : ""}`}
       onClick={() => setPanelOpen(!panelOpen)}
       title={label}
       aria-label={label}
     >
       🔔
-      <span className="badge">{reminders.length}</span>
+      {count > 0 && <span className="badge">{count}</span>}
     </button>
   );
 }

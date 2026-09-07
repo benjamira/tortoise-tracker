@@ -34,12 +34,14 @@ export default function ReminderBanner() {
   const reminderText = useReminderText();
   const { reminders, refresh, panelOpen, setPanelOpen } = useReminders();
 
-  if (!panelOpen || reminders.length === 0) return null;
+  if (!panelOpen) return null;
 
   return (
     <div className="reminder-banner">
       <h3>
-        {t("reminder.openTitle", { count: reminders.length })}{" "}
+        {reminders.length > 0
+          ? t("reminder.openTitle", { count: reminders.length })
+          : t("reminder.none")}{" "}
         <button className="link" onClick={() => setPanelOpen(false)}>
           {t("reminder.hide")}
         </button>

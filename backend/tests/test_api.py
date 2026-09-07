@@ -15,6 +15,11 @@ def _png_bytes(exif_date: str | None = None) -> bytes:
     return buf.getvalue()
 
 
+def test_version_endpoint(client):
+    body = client.get("/api/version").json()
+    assert "version" in body and isinstance(body["version"], str)
+
+
 def test_tortoise_crud(client):
     resp = client.post("/api/tortoises", json={"name": "Speedy", "geschlecht": "weiblich"})
     assert resp.status_code == 201

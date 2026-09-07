@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -38,9 +39,17 @@ app.add_middleware(
 )
 
 
+APP_VERSION = os.environ.get("APP_VERSION", "dev")
+
+
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/api/version")
+def version() -> dict:
+    return {"version": APP_VERSION}
 
 
 app.include_router(tortoises.router)

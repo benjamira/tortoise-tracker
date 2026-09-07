@@ -125,6 +125,8 @@ export const en: Record<keyof typeof de, string> = {
   "notes.placeholder": "e.g. diet change, observations, appointments …",
   "notes.none": "No notes yet.",
 
+  "settings.versions": "Versions",
+
   "settings.title": "Settings",
   "settings.telegramTitle": "Telegram notification",
   "settings.telegramHint":
@@ -144,6 +146,7 @@ export const en: Record<keyof typeof de, string> = {
     "Telegram messages are always sent in German, regardless of this setting.",
 
   "reminder.openTitle": "Open reminders ({count})",
+  "reminder.none": "No open reminders",
   "reminder.hide": "hide",
   "reminder.done": "Done",
   "reminder.snoozeDays": "{days} days",

@@ -31,10 +31,9 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
       setReminders(list);
       const hasNew = list.some((r) => !seen.current.has(r.id));
       seen.current = new Set(list.map((r) => r.id));
-      // Auto-open the panel when a not-yet-seen reminder shows up; auto-close
-      // once nothing is left. Otherwise leave whatever the user chose.
-      if (list.length === 0) setPanelOpen(false);
-      else if (hasNew) setPanelOpen(true);
+      // Auto-open the panel when a not-yet-seen reminder shows up. Otherwise
+      // leave it to the user (the bell stays visible either way).
+      if (hasNew) setPanelOpen(true);
     } catch {
       /* offline / backend not ready */
     }
