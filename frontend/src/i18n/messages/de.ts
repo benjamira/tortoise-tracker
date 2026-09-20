@@ -22,6 +22,7 @@ export const de = {
   "controls.toLight": "Zu hellem Design wechseln",
   "controls.toDark": "Zu dunklem Design wechseln",
   "controls.toggleTheme": "Design umschalten",
+  "controls.batchEntry": "Sammel-Eingabe",
 
   "sidebar.addTortoise": "Schildkröte hinzufügen",
   "sidebar.settings": "Einstellungen",
@@ -96,6 +97,12 @@ export const de = {
   "gewicht.metricRatio": "Jackson-Ratio",
   "gewicht.needTwoPoints": "Mindestens zwei Messwerte für den Graphen nötig.",
   "gewicht.noMeasurements": "Noch keine Messungen",
+
+  "batch.title": "Sammel-Eingabe: Gewicht & Größe",
+  "batch.animal": "Tier",
+  "batch.nothingEntered": "Bitte mindestens einen Wert eingeben.",
+  "batch.noActive": "Keine aktiven Schildkröten vorhanden.",
+  "batch.partialFailure": "Speichern fehlgeschlagen für: {names}",
 
   "fotos.uploading": "Lädt hoch …",
   "fotos.dropPrefix": "Fotos hierher ziehen oder ",

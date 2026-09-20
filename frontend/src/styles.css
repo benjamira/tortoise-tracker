@@ -202,6 +202,15 @@ label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 
   line-height: 16px;
   text-align: center;
 }
+.batch-entry-button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
 
 .main { padding: 22px 26px; max-width: 900px; }
 .tabs {
@@ -312,6 +321,40 @@ th { color: var(--muted); font-weight: 600; }
   display: grid; place-items: center; z-index: 45; padding: 16px;
 }
 .modal { background: var(--panel); border-radius: 12px; padding: 20px; width: 460px; max-width: 100%; max-height: 90vh; overflow: auto; }
+.modal.wide { width: 640px; }
+
+.batch-list { max-height: 50vh; overflow-y: auto; overflow-x: hidden; margin-top: 4px; }
+.batch-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.batch-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.batch-name-cell .avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--avatar-bg);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+}
+.batch-name-cell span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.batch-fields { display: flex; gap: 8px; flex: 1 1 220px; min-width: 0; }
+.batch-field { flex: 1 1 0; min-width: 0; margin-bottom: 0; }
+.batch-field-label { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; }
+.batch-field input { width: 100%; font-size: 1rem; }
 
 .pp-viewport {
   position: relative;
@@ -344,7 +387,11 @@ th { color: var(--muted); font-weight: 600; }
   .tier-item .drag-handle { display: none; }
   .grid2 { grid-template-columns: 1fr; }
   .top-controls { top: 7px; right: 7px; gap: 6px; }
-  .theme-toggle, .reminder-bell { width: 32px; height: 32px; font-size: 0.95rem; }
+  .theme-toggle, .reminder-bell, .batch-entry-button { width: 32px; height: 32px; font-size: 0.95rem; }
   .lang-select { padding: 4px 6px; font-size: 0.85rem; }
   .main { padding: 16px; }
+  .modal.wide { width: 100%; }
+  .batch-list { max-height: 60vh; }
+  .batch-name-cell { flex-basis: 100%; }
+  .batch-fields { flex-basis: 100%; }
 }

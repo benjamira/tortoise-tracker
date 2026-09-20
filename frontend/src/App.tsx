@@ -8,6 +8,7 @@ import ReminderBanner from "./components/ReminderBanner";
 import ReminderBell from "./components/ReminderBell";
 import ThemeToggle from "./components/ThemeToggle";
 import LanguageSelect from "./components/LanguageSelect";
+import BatchEntryButton from "./components/BatchEntryButton";
 
 export interface AppContext {
   tortoises: Tortoise[];
@@ -33,6 +34,7 @@ export default function App() {
   return (
     <div className="app">
       <div className="top-controls">
+        <BatchEntryButton tortoises={tortoises} onSaved={reloadTortoises} />
         <LanguageSelect />
         <ThemeToggle />
         <ReminderBell />

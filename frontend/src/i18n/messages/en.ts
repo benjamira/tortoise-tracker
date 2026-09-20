@@ -22,6 +22,7 @@ export const en: Record<keyof typeof de, string> = {
   "controls.toLight": "Switch to light theme",
   "controls.toDark": "Switch to dark theme",
   "controls.toggleTheme": "Toggle theme",
+  "controls.batchEntry": "Batch entry",
 
   "sidebar.addTortoise": "Add tortoise",
   "sidebar.settings": "Settings",
@@ -96,6 +97,12 @@ export const en: Record<keyof typeof de, string> = {
   "gewicht.metricRatio": "Jackson ratio",
   "gewicht.needTwoPoints": "At least two measurements are needed for the chart.",
   "gewicht.noMeasurements": "No measurements yet",
+
+  "batch.title": "Batch entry: weight & size",
+  "batch.animal": "Tortoise",
+  "batch.nothingEntered": "Please enter at least one value.",
+  "batch.noActive": "No active tortoises.",
+  "batch.partialFailure": "Saving failed for: {names}",
 
   "fotos.uploading": "Uploading …",
   "fotos.dropPrefix": "Drag photos here or ",
