@@ -90,7 +90,7 @@ export const en: Record<keyof typeof de, string> = {
   "gewicht.newMeasurement": "New measurement",
   "gewicht.date": "Date",
   "gewicht.weightG": "Weight (g)",
-  "gewicht.lengthMm": "Carapace length (mm)",
+  "gewicht.lengthCm": "Carapace length (cm)",
   "gewicht.needWeightOrLength": "Please enter a weight or carapace length.",
   "gewicht.metricWeight": "Weight",
   "gewicht.metricLength": "Carapace length",

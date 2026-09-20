@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "../api";
-import { parseWeight } from "../format";
+import { parseLengthCm, parseWeight } from "../format";
 import { useT } from "../i18n";
 import type { Tortoise } from "../types";
 import Modal from "./Modal";
@@ -42,9 +42,9 @@ export default function BatchEntryModal({
         i,
         r,
         g: parseWeight(r.gewicht),
-        l: r.laenge.trim() ? Number(r.laenge) : null,
+        l: parseLengthCm(r.laenge),
       }))
-      .filter(({ g, l }) => g != null || (l != null && !Number.isNaN(l)));
+      .filter(({ g, l }) => g != null || l != null);
 
     if (candidates.length === 0) {
       setErr(t("batch.nothingEntered"));
@@ -125,15 +125,16 @@ export default function BatchEntryModal({
                   />
                 </label>
                 <label className="batch-field">
-                  <span className="batch-field-label">{t("gewicht.lengthMm")}</span>
+                  <span className="batch-field-label">{t("gewicht.lengthCm")}</span>
                   <input
                     type="number"
-                    inputMode="numeric"
+                    inputMode="decimal"
+                    step="0.1"
                     min="0"
                     value={row.laenge}
                     disabled={busy}
                     onChange={(e) => updateRow(i, "laenge", e.target.value)}
-                    aria-label={`${t("gewicht.lengthMm")} ${row.tortoise.name}`}
+                    aria-label={`${t("gewicht.lengthCm")} ${row.tortoise.name}`}
                   />
                 </label>
               </div>

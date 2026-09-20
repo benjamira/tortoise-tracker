@@ -90,7 +90,7 @@ export const de = {
   "gewicht.newMeasurement": "Neue Messung",
   "gewicht.date": "Datum",
   "gewicht.weightG": "Gewicht (g)",
-  "gewicht.lengthMm": "Panzerlänge (mm)",
+  "gewicht.lengthCm": "Panzerlänge (cm)",
   "gewicht.needWeightOrLength": "Bitte Gewicht oder Panzerlänge eingeben.",
   "gewicht.metricWeight": "Gewicht",
   "gewicht.metricLength": "Panzerlänge",

@@ -31,3 +31,17 @@ export function parseWeight(input: string): number | null {
   const n = Number(s);
   return Number.isFinite(n) ? Math.round(n * 10) / 10 : null;
 }
+
+/** Carapace length in mm, formatted as cm with one decimal. */
+export function formatLength(mm?: number | null): string {
+  if (mm == null) return "–";
+  return `${(mm / 10).toLocaleString(locale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })} cm`;
+}
+
+/** Parse a user-typed length in cm ("18,5" or "18.5") to whole millimetres for storage. */
+export function parseLengthCm(input: string): number | null {
+  const s = input.trim().replace(",", ".");
+  if (s === "") return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? Math.round(n * 10) : null;
+}

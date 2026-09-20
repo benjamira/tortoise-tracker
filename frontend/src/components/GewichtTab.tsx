@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { api } from "../api";
-import { formatDate, formatWeight, parseWeight } from "../format";
+import { formatDate, formatLength, formatWeight, parseLengthCm, parseWeight } from "../format";
 import { useT } from "../i18n";
 import { useTheme } from "../theme";
 import type { Measurement } from "../types";
@@ -43,7 +43,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
     e.preventDefault();
     setErr(null);
     const g = parseWeight(gewicht);
-    const l = laenge.trim() ? Number(laenge) : null;
+    const l = parseLengthCm(laenge);
     if (g == null && l == null) {
       setErr(t("gewicht.needWeightOrLength"));
       return;
@@ -103,10 +103,11 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
             />
           </div>
           <div className="field">
-            <label>{t("gewicht.lengthMm")}</label>
+            <label>{t("gewicht.lengthCm")}</label>
             <input
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="0.1"
               value={laenge}
               onChange={(e) => setLaenge(e.target.value)}
             />
@@ -185,7 +186,7 @@ export default function GewichtTab({ tortoiseId, onChanged }: { tortoiseId: numb
               <tr key={r.id}>
                 <td>{formatDate(r.datum)}</td>
                 <td>{formatWeight(r.gewicht_g)}</td>
-                <td>{r.panzerlaenge_mm != null ? `${r.panzerlaenge_mm} mm` : "–"}</td>
+                <td>{formatLength(r.panzerlaenge_mm)}</td>
                 <td>{r.jackson_ratio ?? "–"}</td>
                 <td>
                   <button
