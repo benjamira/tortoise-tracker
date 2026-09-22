@@ -10,6 +10,7 @@ from .models import Attachment
 
 _MARGIN = 15
 _CAPTION_HEIGHT = 10
+_TARGET_DPI = 150  # plenty for a printed/on-screen photo at page size; keeps the PDF small
 
 
 def slugify(name: str) -> str:
@@ -35,8 +36,16 @@ def build_photo_pdf(tortoise_name: str, photos: list[Attachment]) -> bytes:
                 scale = min(max_w / w_px, max_h / h_px)
                 draw_w, draw_h = w_px * scale, h_px * scale
 
+                # Camera photos are usually far higher-resolution than the page
+                # needs; downscale to the DPI we'll actually render at instead of
+                # embedding the full original pixels (that's what bloated the PDF).
+                target_w = max(1, round(draw_w / 25.4 * _TARGET_DPI))
+                target_h = max(1, round(draw_h / 25.4 * _TARGET_DPI))
+                if target_w < w_px or target_h < h_px:
+                    img = img.resize((target_w, target_h), Image.LANCZOS)
+
                 buf = BytesIO()
-                img.save(buf, "JPEG", quality=88)
+                img.save(buf, "JPEG", quality=82)
                 buf.seek(0)
                 pdf.image(buf, x=(page_w - draw_w) / 2, y=_MARGIN, w=draw_w, h=draw_h)
 
