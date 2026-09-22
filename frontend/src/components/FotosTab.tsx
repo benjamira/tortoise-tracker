@@ -110,52 +110,63 @@ export default function FotosTab({
           {t("fotos.noPhotos")}
         </p>
       ) : (
-        <div className="photo-timeline" style={{ marginTop: 22 }}>
-          {photos.map((p, i) => (
-            <div className="photo-row" key={p.id}>
-              <span className="dot" />
-              <img
-                src={p.thumbnail_url ?? p.url}
-                alt={p.beschriftung ?? ""}
-                onClick={() => setLightbox(i)}
-              />
-              <div>
-                {editId === p.id ? (
-                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                    <input
-                      type="date"
-                      value={editDate}
-                      onChange={(e) => setEditDate(e.target.value)}
-                      style={{ width: "auto" }}
-                      autoFocus
-                    />
-                    <button type="button" className="primary" onClick={() => saveDate(p.id)}>
-                      {t("action.save")}
-                    </button>
-                    <button type="button" onClick={() => setEditId(null)}>
-                      {t("action.cancel")}
-                    </button>
+        <>
+          <div className="photo-timeline" style={{ marginTop: 22 }}>
+            {photos.map((p, i) => (
+              <div className="photo-row" key={p.id}>
+                <span className="dot" />
+                <img
+                  src={p.thumbnail_url ?? p.url}
+                  alt={p.beschriftung ?? ""}
+                  onClick={() => setLightbox(i)}
+                />
+                <div>
+                  {editId === p.id ? (
+                    <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                      <input
+                        type="date"
+                        value={editDate}
+                        onChange={(e) => setEditDate(e.target.value)}
+                        style={{ width: "auto" }}
+                        autoFocus
+                      />
+                      <button type="button" className="primary" onClick={() => saveDate(p.id)}>
+                        {t("action.save")}
+                      </button>
+                      <button type="button" onClick={() => setEditId(null)}>
+                        {t("action.cancel")}
+                      </button>
+                    </div>
+                  ) : (
+                    <strong>
+                      {p.aufnahme_datum ? formatDate(p.aufnahme_datum) : t("fotos.noDate")}{" "}
+                      <button
+                        type="button"
+                        className="link"
+                        title={t("fotos.editDate")}
+                        onClick={() => startEdit(p)}
+                      >
+                        {t("action.edit")}
+                      </button>
+                    </strong>
+                  )}
+                  <div className="muted" style={{ fontSize: "0.82rem" }}>
+                    {p.originalname}
                   </div>
-                ) : (
-                  <strong>
-                    {p.aufnahme_datum ? formatDate(p.aufnahme_datum) : t("fotos.noDate")}{" "}
-                    <button
-                      type="button"
-                      className="link"
-                      title={t("fotos.editDate")}
-                      onClick={() => startEdit(p)}
-                    >
-                      {t("action.edit")}
-                    </button>
-                  </strong>
-                )}
-                <div className="muted" style={{ fontSize: "0.82rem" }}>
-                  {p.originalname}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            style={{ marginTop: 16 }}
+            onClick={() => {
+              window.location.href = api.fotosPdfUrl(tortoiseId);
+            }}
+          >
+            {t("fotos.downloadPdf")}
+          </button>
+        </>
       )}
 
       {lightbox != null && (

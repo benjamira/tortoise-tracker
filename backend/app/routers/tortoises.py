@@ -2,12 +2,14 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlmodel import Session, select
 
 from ..db import get_session
 from ..models import Attachment, Measurement, Tortoise
+from ..pdf import build_photo_pdf, slugify
 from ..serializers import attachment_out
 from ..storage import thumb_name
 
@@ -168,3 +170,30 @@ def list_attachments(tid: int, art: Optional[str] = None, session: Session = Dep
         query = query.where(Attachment.art == art)
     query = query.order_by(Attachment.aufnahme_datum, Attachment.hochgeladen_am)
     return [attachment_out(a) for a in session.exec(query).all()]
+
+
+@router.get("/{tid}/fotos/pdf")
+def fotos_pdf(tid: int, session: Session = Depends(get_session)):
+    tortoise = session.get(Tortoise, tid)
+    if not tortoise:
+        raise HTTPException(404, "Schildkröte nicht gefunden")
+
+    photos = session.exec(
+        select(Attachment)
+        .where(Attachment.tortoise_id == tid, Attachment.art == "foto")
+        .order_by(Attachment.aufnahme_datum, Attachment.hochgeladen_am)
+    ).all()
+    if not photos:
+        raise HTTPException(404, "Keine Fotos vorhanden")
+
+    try:
+        pdf_bytes = build_photo_pdf(tortoise.name, photos)
+    except ValueError:
+        raise HTTPException(500, "Fotos konnten nicht geladen werden")
+
+    filename = f"{slugify(tortoise.name)}-fotodokumentation.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

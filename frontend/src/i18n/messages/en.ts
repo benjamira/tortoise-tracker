@@ -111,6 +111,7 @@ export const en: Record<keyof typeof de, string> = {
   "fotos.noPhotos": "No photos in the log yet.",
   "fotos.noDate": "no date",
   "fotos.editDate": "Correct the capture date",
+  "fotos.downloadPdf": "Download as PDF",
 
   "timeline.addEvent": "Add event",
   "timeline.type": "Type",

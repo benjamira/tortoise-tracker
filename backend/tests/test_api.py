@@ -100,6 +100,26 @@ def test_photo_upload_reads_exif_date(client):
     )
 
 
+def test_fotos_pdf_export(client):
+    tid = client.post("/api/tortoises", json={"name": "Paula"}).json()["id"]
+    assert client.get(f"/api/tortoises/{tid}/fotos/pdf").status_code == 404
+
+    client.post(
+        f"/api/tortoises/{tid}/attachments",
+        files={"files": ("a.jpg", _png_bytes("2025:06:15 10:00:00"), "image/jpeg")},
+    )
+    client.post(
+        f"/api/tortoises/{tid}/attachments",
+        files={"files": ("b.jpg", _png_bytes("2025:07:01 10:00:00"), "image/jpeg")},
+    )
+
+    resp = client.get(f"/api/tortoises/{tid}/fotos/pdf")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/pdf"
+    assert "fotodokumentation" in resp.headers["content-disposition"]
+    assert resp.content.startswith(b"%PDF")
+
+
 def test_eigene_nachzucht_fixes_origin(client):
     created = client.post(
         "/api/tortoises",

@@ -111,6 +111,7 @@ export const de = {
   "fotos.noPhotos": "Noch keine Fotos in der Dokumentation.",
   "fotos.noDate": "ohne Datum",
   "fotos.editDate": "Aufnahmedatum korrigieren",
+  "fotos.downloadPdf": "Als PDF herunterladen",
 
   "timeline.addEvent": "Ereignis hinzufügen",
   "timeline.type": "Typ",

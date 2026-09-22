@@ -68,6 +68,7 @@ export const api = {
     req<Attachment[]>(
       `/api/tortoises/${tid}/attachments${art ? `?art=${art}` : ""}`,
     ),
+  fotosPdfUrl: (tid: number) => `/api/tortoises/${tid}/fotos/pdf`,
   uploadAttachments: (tid: number, files: File[], opts?: { art?: string; event_id?: number }) => {
     const form = new FormData();
     files.forEach((f) => form.append("files", f));
