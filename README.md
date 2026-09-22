@@ -26,10 +26,15 @@ at the enclosure) and has no login – intended to run on your own home network.
   in the sidebar.
 - **Weight history** – quick entry (date pre-filled), a trend chart switchable
   between weight, carapace length (SCL) and Jackson ratio, plus a table.
-  Weight accepts one decimal place.
+  Weight accepts one decimal place, carapace length is entered in cm.
+- **Batch weight/length entry** – a "+" button next to the language selector
+  opens an overlay listing all active animals with a weight and length field
+  each; fill in as many as needed (only filled-in fields are saved) and save
+  them all in one go, e.g. after a weighing round for the whole collection.
 - **Photo log** – drag-and-drop upload (multiple files, incl. HEIC/iPhone). The
   capture date is read from the EXIF data; shown as a vertical timeline
-  (old → new) with thumbnails and a lightbox.
+  (old → new) with thumbnails and a lightbox. The full log can be downloaded
+  as a single dated PDF (one photo per page, ordered by date).
 - **Timeline** – free-text events typed as: start/end of hibernation, vet visit,
   medication, other.
 - **Document store** per animal (PDF/image) for the CITES certificate, proof of
